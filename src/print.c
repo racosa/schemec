@@ -14,6 +14,38 @@
 
 void sfs_print_atom( object o ) {
 
+    switch (o->type) {
+
+      case SFS_NUMBER:
+        printf( "SFS_NUMBER: %d", o->this.number.this.integer );
+      break;
+
+      case SFS_CHARACTER:
+        printf( "SFS_CHARACTER: %c", o->this.character );
+      break;
+
+      case SFS_STRING:
+        printf( "SFS_STRING: %s", o->this.string );
+      break;
+
+      case SFS_BOOLEAN:
+        if( o == true ){
+            printf( "SFS_BOOLEAN: #t" );
+        }
+        else if( o == false ){
+            printf( "SFS_BOOLEAN: #f" );
+        }
+      break;
+
+      case SFS_SYMBOL:
+        printf( "SFS_SYMBOL: %s", o->this.symbol );
+      break;
+    
+      case SFS_NIL:
+        printf("SFS_NIL: ()");
+      break;
+
+    }
     return;
 }
 
