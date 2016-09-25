@@ -313,26 +313,27 @@ object sfs_read_atom( char *input, uint *here ) {
 
     object atom;
     int state = STATE_INIT;
-    uint input_index = *here;
     int number_input = 0;
 
-    while ( input_index < strlen( input ) + 1 ){
+    while ( (*here) <= strlen( input ) ){
       switch ( state ) {
 
         case STATE_INIT:
-          if( input[ input_index ] == '\0' ){
+          if( input[ (*here) ] == '\0' ){
             state = STATE_INIT;
           }
-          else if( input[ input_index ] == '+' || input[ input_index ] == '-' ){
+          else if( input[ (*here) ] == '+' || input[ (*here) ] == '-' ){
+            DEBUG_MSG("STATE_NUMBER0");
             state = STATE_NUMBER;
           }
-          else if( input[ input_index ] >= '0' && input[ input_index ] <= '9'){
+          else if( input[ (*here) ] >= '0' && input[ (*here) ] <= '9'){
+            DEBUG_MSG("STATE_NUMBER1");
             state = STATE_NUMBER;
           }
-          else if( input[ input_index ] == '\"' ){
+          else if( input[ (*here) ] == '\"' ){
             state = STATE_CHAINE_CHAR;
           }
-          else if( input[ input_index ] == '#'){
+          else if( input[ (*here) ] == '#'){
             state = STATE_BOOLEAN;
           }
           else{
@@ -341,10 +342,8 @@ object sfs_read_atom( char *input, uint *here ) {
           break;
 
         case STATE_NUMBER:
-          if( input[ input_index ] >= '0' && input[ input_index ] <= '9' ){
-            state = STATE_NUMBER;
-          }
-          else{
+          if( input [ (*here) ] == '\0' ){
+            DEBUG_MSG("STATE_NUMBER3");
             number_input = atoi(input);
             atom = make_integer(number_input);
             DEBUG_MSG("Atome identified of type: SFS_NUMBER -> Value: %d ", atom->this.number.this.integer );
@@ -352,55 +351,64 @@ object sfs_read_atom( char *input, uint *here ) {
           break;
 
         case STATE_CHAINE_CHAR:
-          if( input [ input_index ] == '\"' ){
+          if( input [ (*here) ] == '\"' ){
             atom = make_string( input );
             DEBUG_MSG("Atome identified of type: SFS_STRING -> Value: %s ", atom->this.string );
           }
           break;
 
         case STATE_BOOLEAN:
-          if( input[ input_index ] == 't' ){
+          if( input[ (*here) ] == 't' && input[ (*here)+1 ] == '\0' ){
             atom = true;
             DEBUG_MSG("Atome identified of type: SFS_BOOLEAN -> Value: true " );
           }
-          else if ( input[ input_index ] == 'f' ){
+          else if ( input[ (*here) ] == 'f' && input[ (*here)+1 ] == '\0' ){
             atom = false;
             DEBUG_MSG("Atome identified of type: SFS_BOOLEAN -> Value: false " );
           }
-          else if ( input[ input_index ] == '\\' ) {
+          else if ( input[ (*here) ] == '\\' ) {
             state = STATE_CHAR;
+          }
+          else if ( input[ (*here) ] != '\0' ){
+            WARNING_MSG("ERROR: invalid atom type");
+            return 0;
           }
           break;
 
         case STATE_CHAR:
-          if( !strcmp( input, "#\\space" ) ){
+          if( !strcmp( input, "#\\space" ) && input[ (*here)+6 ] == '\0' ){
             atom = make_character( ' ' );
-            DEBUG_MSG("Atome identified of type: SFS_CHARACTER -> Value: %c ", atom->this.character );
-            input_index = 7;
+            DEBUG_MSG("Atome identified of type: SFS_CHARACTER -> Value: #\\space " );
+            (*here) = 7;
           }
-          else if( !strcmp( input, "#\\newline" ) ){
+          else if( !strcmp( input, "#\\newline" ) && input[ (*here)+8 ] == '\0' ){
             atom = make_character( '\n' );
-            DEBUG_MSG("Atome identified of type: SFS_CHARACTER -> Value: %c ", atom->this.character );
-            input_index = 9;
+            DEBUG_MSG("Atome identified of type: SFS_CHARACTER -> Value: #\\newline " );
+            (*here) = 9;
           }
-          else if( input[input_index] != '\0' ){
-            atom = make_character( input[ input_index ] );
+          else if( input[ (*here) ] != '\0' && input[ (*here)+1 ] == '\0' ){
+            atom = make_character( input[ (*here) ] );
             DEBUG_MSG("Atome identified of type: SFS_CHARACTER -> Value: %c ", atom->this.character );
+          }
+          else if ( input[ (*here) ] != '\0' ){
+            WARNING_MSG("ERROR: invalid atom type");
+            return 0;
           }
           break;
 
         case STATE_SYMBOL:
-          if( input[ input_index ] == '\0' ){
+          if( input[ (*here) ] == '\0' ){
             atom = make_symbol( input );
             DEBUG_MSG("Atome identified of type: SFS_SYMBOL -> Value: %s ", atom->this.symbol );
           }
           break;
 
         default:
-          ERROR_MSG("invalid atom");
+          WARNING_MSG("ERROR: invalid atom type");
+          return 0;
           break;
       }
-      input_index++;
+      (*here)++;
 
     }
     return atom;
@@ -414,3 +422,11 @@ object sfs_read_pair( char *stream, uint *i ) {
 
     return pair;
 }
+
+/*
+int indentify_atom_lenght( char *input, uint *here ){
+    uint atom_last_char = *here;
+
+    if (input[atom_last_char]==)
+}
+*/

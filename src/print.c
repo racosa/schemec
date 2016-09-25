@@ -21,7 +21,15 @@ void sfs_print_atom( object o ) {
       break;
 
       case SFS_CHARACTER:
-        printf( "SFS_CHARACTER: %c", o->this.character );
+        if( o->this.character == ' ' ){
+          printf( "SFS_CHARACTER: #\\space " );
+        }
+        else if( o->this.character == '\n' ) {
+          printf( "SFS_CHARACTER: #\\newline " );
+        }
+        else{
+          printf( "SFS_CHARACTER: %c", o->this.character );
+        }
       break;
 
       case SFS_STRING:
@@ -40,7 +48,7 @@ void sfs_print_atom( object o ) {
       case SFS_SYMBOL:
         printf( "SFS_SYMBOL: %s", o->this.symbol );
       break;
-    
+
       case SFS_NIL:
         printf("SFS_NIL: ()");
       break;
