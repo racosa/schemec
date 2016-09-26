@@ -49,7 +49,7 @@ object make_integer ( int integer );
 object make_character( char character );
 object make_string ( string string );
 object make_symbol ( string symbol );
-object make_pair ( object car, object cdr );
+object make_pair ( void );
 
 #define SFS_NUMBER       0x00
 #define SFS_CHARACTER    0x01

@@ -15,7 +15,8 @@
 #include <readline/history.h>
 
 #include "read.h"
-
+#include "mem.h"
+#include "print.h"
 
 
 void flip( uint *i ) {
@@ -291,12 +292,12 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
     return S_OK;
 }
 
-
 object sfs_read( char *input, uint *here ) {
 
     if ( input[*here] == '(' ) {
         if ( input[(*here)+1] == ')' ) {
             *here += 2;
+            DEBUG_MSG("Atome identified of type: SFS_NIL -> Value: () " );
             return nil;
         }
         else {
@@ -314,20 +315,29 @@ object sfs_read_atom( char *input, uint *here ) {
     object atom;
     int state = STATE_INIT;
     int number_input = 0;
+    char *atom_input;
+    uint atom_size = 0;
 
-    while ( (*here) <= strlen( input ) ){
+    uint here_init = *here;
+    uint atom_found = FALSE;
+
+    atom_input = NULL;
+
+    while ( !atom_found ){
       switch ( state ) {
 
         case STATE_INIT:
-          if( input[ (*here) ] == '\0' ){
+          if( input[ (*here) ] == ' ' ){
             state = STATE_INIT;
           }
+          else if( input[ (*here) ] == '(' && input[ (*here) + 1 ] == ')' ){
+            state = STATE_EMPTY_LIST;
+          }
+
           else if( input[ (*here) ] == '+' || input[ (*here) ] == '-' ){
-            DEBUG_MSG("STATE_NUMBER0");
             state = STATE_NUMBER;
           }
           else if( input[ (*here) ] >= '0' && input[ (*here) ] <= '9'){
-            DEBUG_MSG("STATE_NUMBER1");
             state = STATE_NUMBER;
           }
           else if( input[ (*here) ] == '\"' ){
@@ -336,72 +346,96 @@ object sfs_read_atom( char *input, uint *here ) {
           else if( input[ (*here) ] == '#'){
             state = STATE_BOOLEAN;
           }
-          else{
+          else if ( input[ (*here) ] != ')' && input[ (*here) ] != 32 && input[ (*here) ] != 0 ){
             state = STATE_SYMBOL;
           }
           break;
 
         case STATE_NUMBER:
-          if( input [ (*here) ] == '\0' ){
-            DEBUG_MSG("STATE_NUMBER3");
-            number_input = atoi(input);
+          if( input [ (*here) ] == '\0' || input [ (*here) ] == ' ' ){
+            atom_size = (*here)- here_init;
+            atom_input = sfs_malloc( (atom_size)*sizeof( char ) );
+            memmove(atom_input, (input + here_init), atom_size);
+            number_input = atoi(atom_input);
             atom = make_integer(number_input);
             DEBUG_MSG("Atome identified of type: SFS_NUMBER -> Value: %d ", atom->this.number.this.integer );
+            sfs_free(atom_input);
+            atom_found = TRUE;
           }
           break;
 
         case STATE_CHAINE_CHAR:
-          if( input [ (*here) ] == '\"' ){
-            atom = make_string( input );
+          if( input [ (*here) ] == '\"' && (input [ (*here) + 1 ] == '\0' || input [ (*here) + 1 ] == ' ' ) ){
+            atom_size = (*here)- here_init + 1;
+            atom_input = sfs_malloc( (atom_size)*sizeof( char ) );
+            memmove( atom_input, &input[here_init], atom_size );
+            atom = make_string( atom_input );
             DEBUG_MSG("Atome identified of type: SFS_STRING -> Value: %s ", atom->this.string );
+            sfs_free(atom_input);
+            atom_found = TRUE;
           }
           break;
 
         case STATE_BOOLEAN:
-          if( input[ (*here) ] == 't' && input[ (*here)+1 ] == '\0' ){
-            atom = true;
-            DEBUG_MSG("Atome identified of type: SFS_BOOLEAN -> Value: true " );
-          }
-          else if ( input[ (*here) ] == 'f' && input[ (*here)+1 ] == '\0' ){
-            atom = false;
-            DEBUG_MSG("Atome identified of type: SFS_BOOLEAN -> Value: false " );
+          if(input[ (*here)+1 ] == '\0' || input [ (*here)+1 ] == ' '){
+            if( input[ (*here) ] == 't' ){
+              atom = true;
+              DEBUG_MSG("Atome identified of type: SFS_BOOLEAN -> Value: true " );
+              atom_found = TRUE;
+            }
+            else if ( input[ (*here) ] == 'f' ){
+              atom = false;
+              DEBUG_MSG("Atome identified of type: SFS_BOOLEAN -> Value: false " );
+              atom_found = TRUE;
+            }
           }
           else if ( input[ (*here) ] == '\\' ) {
             state = STATE_CHAR;
           }
-          else if ( input[ (*here) ] != '\0' ){
+          else {
             WARNING_MSG("ERROR: invalid atom type");
             return 0;
           }
           break;
 
         case STATE_CHAR:
-          if( !strcmp( input, "#\\space" ) && input[ (*here)+6 ] == '\0' ){
+          if( !strcmp( input, "#\\space" ) && ( input[ (*here)+6 ] == '\0' || input [ (*here) ] == ' ' ) ){
             atom = make_character( ' ' );
             DEBUG_MSG("Atome identified of type: SFS_CHARACTER -> Value: #\\space " );
-            (*here) = 7;
+            atom_found = TRUE;
           }
-          else if( !strcmp( input, "#\\newline" ) && input[ (*here)+8 ] == '\0' ){
+          else if( !strcmp( input, "#\\newline" ) && ( input[ (*here)+8 ] == '\0' || input [ (*here) ] == ' ' ) ){
             atom = make_character( '\n' );
             DEBUG_MSG("Atome identified of type: SFS_CHARACTER -> Value: #\\newline " );
-            (*here) = 9;
+            atom_found = TRUE;
           }
-          else if( input[ (*here) ] != '\0' && input[ (*here)+1 ] == '\0' ){
+          else if( input[ (*here) ] != '\0' && ( input[ (*here)+1 ] == '\0' || input [ (*here)+1 ] == ' ' ) ){
             atom = make_character( input[ (*here) ] );
             DEBUG_MSG("Atome identified of type: SFS_CHARACTER -> Value: %c ", atom->this.character );
+            atom_found = TRUE;
           }
-          else if ( input[ (*here) ] != '\0' ){
+          else if ( input[ (*here) ] != '\0' || input [ (*here) ] == ' ' ){
             WARNING_MSG("ERROR: invalid atom type");
             return 0;
           }
           break;
 
         case STATE_SYMBOL:
-          if( input[ (*here) ] == '\0' ){
-            atom = make_symbol( input );
+          if( input[ (*here) ] == '\0' || input [ (*here) ] == ' ' ){
+            atom_input = sfs_malloc(((*here)-(here_init)+1)*sizeof( char ));
+            memmove(atom_input, (input+(here_init)), (*here)-(here_init));
+            atom = make_symbol( atom_input );
             DEBUG_MSG("Atome identified of type: SFS_SYMBOL -> Value: %s ", atom->this.symbol );
+            free(atom_input);
+            atom_found = TRUE;
           }
           break;
+
+        case STATE_EMPTY_LIST:
+          atom = nil;
+          DEBUG_MSG("Atome identified of type: SFS_NIL -> Value: () " );
+          atom_found = TRUE;
+        break;
 
         default:
           WARNING_MSG("ERROR: invalid atom type");
@@ -416,17 +450,45 @@ object sfs_read_atom( char *input, uint *here ) {
 
 object sfs_read_pair( char *stream, uint *i ) {
 
+    object pair = make_pair();
+    object next_object;
+    uint pair_found = FALSE;
+    while (*i < strlen(stream)) {
+      if (isspace(stream[*i])){
+          (*i)++;
+      }
+      DEBUG_MSG("i = %d", *i);
 
+      if (stream[*i] == ')') {
+        DEBUG_MSG("return pair");
+        (*i)++;
+        return pair;
+      }
+      else {
+        next_object = sfs_read( stream, i );
+        if (next_object){
+          DEBUG_MSG("insert list");
 
-    object pair = NULL;
-
-    return pair;
+          insert_linked_list( next_object, pair );
+        }
+        else{
+          DEBUG_MSG("return 0");
+          return 0;
+        }
+      }
+    }
 }
 
-/*
-int indentify_atom_lenght( char *input, uint *here ){
-    uint atom_last_char = *here;
 
-    if (input[atom_last_char]==)
+void insert_linked_list(object car, object list){
+
+    if (list->this.pair.car == NULL){
+      list->this.pair.car = car;
+    }
+    else{
+      object new_pair = make_pair();
+      new_pair->this.pair.car = car;
+      new_pair->this.pair.cdr = list->this.pair.cdr;
+      list->this.pair.cdr = new_pair;
+    }
 }
-*/
