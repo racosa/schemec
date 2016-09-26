@@ -32,7 +32,7 @@ void sfs_print_atom( object o ) {
         }
         else{
           /*printf( "SFS_CHARACTER: %c", o->this.character );*/
-          printf( "%c ", o->this.character );
+          printf( "#\\%c ", o->this.character );
         }
       break;
 
@@ -70,14 +70,29 @@ void sfs_print_atom( object o ) {
 }
 
 void sfs_print_pair( object o ) {
-    sfs_print(o->this.pair.car);
+
+  /*  if(o->root_node == 1 | o->this.pair.car->type == SFS_PAIR){
+      printf("( " );
+      sfs_print(o->this.pair.car);
+    }
+    */
+    if(o->this.pair.car->type == SFS_PAIR ){
+      printf("( " );
+      sfs_print(o->this.pair.car);
+    }
+
+    else{
+      sfs_print(o->this.pair.car);
+    }
+
+/*    sfs_print(o->this.pair.car); */
     if (o->this.pair.cdr == nil){
       printf(") ");
     }
-    else{
+    else {
       sfs_print(o->this.pair.cdr);
     }
-  return;
+    return;
 }
 
 void sfs_print( object o ) {

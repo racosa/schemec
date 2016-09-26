@@ -329,6 +329,7 @@ object sfs_read_atom( char *input, uint *here ) {
         case STATE_INIT:
           if( input[ (*here) ] == ' ' ){
             state = STATE_INIT;
+            DEBUG_MSG("STATE_INIT");
           }
           else if( input[ (*here) ] == '(' && input[ (*here) + 1 ] == ')' ){
             state = STATE_EMPTY_LIST;
@@ -346,7 +347,7 @@ object sfs_read_atom( char *input, uint *here ) {
           else if( input[ (*here) ] == '#'){
             state = STATE_BOOLEAN;
           }
-          else if ( input[ (*here) ] != ')' && input[ (*here) ] != 32 && input[ (*here) ] != 0 ){
+          else if ( input[ (*here) ] != ')' && input[ (*here) ] != ' ' && input[ (*here) ] != 0 ){
             state = STATE_SYMBOL;
           }
           break;
@@ -452,7 +453,7 @@ object sfs_read_pair( char *stream, uint *i ) {
 
     object pair = make_pair();
     object next_object;
-    uint pair_found = FALSE;
+
     while (*i < strlen(stream)) {
       if (isspace(stream[*i])){
           (*i)++;
@@ -468,7 +469,6 @@ object sfs_read_pair( char *stream, uint *i ) {
         next_object = sfs_read( stream, i );
         if (next_object){
           DEBUG_MSG("insert list");
-
           insert_linked_list( next_object, pair );
         }
         else{
@@ -477,6 +477,7 @@ object sfs_read_pair( char *stream, uint *i ) {
         }
       }
     }
+    return 0;
 }
 
 
@@ -484,11 +485,24 @@ void insert_linked_list(object car, object list){
 
     if (list->this.pair.car == NULL){
       list->this.pair.car = car;
+    /*  return list; */
     }
     else{
+    /*
       object new_pair = make_pair();
       new_pair->this.pair.car = car;
       new_pair->this.pair.cdr = list->this.pair.cdr;
       list->this.pair.cdr = new_pair;
+      */
+      object new_pair = make_pair();
+      while(true){
+        if ( list->this.pair.cdr == nil ){
+          new_pair->this.pair.car = car;
+          list->this.pair.cdr = new_pair ;
+          break;
+        }
+        list = list->this.pair.cdr;
+      }
+      /*return new_pair;*/
     }
 }

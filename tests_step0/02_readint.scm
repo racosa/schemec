@@ -8,7 +8,6 @@
 42
    45
 -55
-+43
 	-67
 ;;; Make sure you put a return at
 ;;; the end of the input file
