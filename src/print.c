@@ -17,49 +17,67 @@ void sfs_print_atom( object o ) {
     switch (o->type) {
 
       case SFS_NUMBER:
-        printf( "SFS_NUMBER: %d", o->this.number.this.integer );
+        /*printf( "SFS_NUMBER: %d", o->this.number.this.integer );*/
+        printf( "%d ", o->this.number.this.integer );
       break;
 
       case SFS_CHARACTER:
         if( o->this.character == ' ' ){
-          printf( "SFS_CHARACTER: #\\space " );
+          /*printf( "SFS_CHARACTER: #\\space " );*/
+          printf( "#\\space " );
         }
         else if( o->this.character == '\n' ) {
-          printf( "SFS_CHARACTER: #\\newline " );
+          /*printf( "SFS_CHARACTER: #\\newline " );*/
+          printf( "#\\newline " );
         }
         else{
-          printf( "SFS_CHARACTER: %c", o->this.character );
+          /*printf( "SFS_CHARACTER: %c", o->this.character );*/
+          printf( "%c ", o->this.character );
         }
       break;
 
       case SFS_STRING:
-        printf( "SFS_STRING: %s", o->this.string );
+        /*printf( "SFS_STRING: %s", o->this.string );*/
+        printf( "%s ", o->this.string );
       break;
 
       case SFS_BOOLEAN:
         if( o == true ){
-            printf( "SFS_BOOLEAN: #t" );
+            /*printf( "SFS_BOOLEAN: #t" );*/
+            printf( "#t " );
         }
         else if( o == false ){
-            printf( "SFS_BOOLEAN: #f" );
+            /*printf( "SFS_BOOLEAN: #f" );*/
+            printf( "#f " );
         }
       break;
 
       case SFS_SYMBOL:
-        printf( "SFS_SYMBOL: %s", o->this.symbol );
+        /*printf( "SFS_SYMBOL: %s", o->this.symbol );*/
+        printf( "%s ", o->this.symbol );
       break;
 
       case SFS_NIL:
-        printf("SFS_NIL: ()");
+        /*printf("SFS_NIL: ()");*/
+        printf("() ");
       break;
 
+      default:
+        ERROR_MSG("ERROR print_atom");
+      break;
     }
     return;
 }
 
 void sfs_print_pair( object o ) {
-
-    return;
+    sfs_print(o->this.pair.car);
+    if (o->this.pair.cdr == nil){
+      printf(") ");
+    }
+    else{
+      sfs_print(o->this.pair.cdr);
+    }
+  return;
 }
 
 void sfs_print( object o ) {

@@ -27,7 +27,9 @@ object sfs_read( char *input, uint *here );
 object sfs_read_atom( char *input, uint *here );
 object sfs_read_pair( char *stream, uint *i );
 
-enum {STATE_INIT, STATE_NUMBER, STATE_CHAINE_CHAR, STATE_CHAR, STATE_BOOLEAN, STATE_SYMBOL};
+void insert_linked_list(object car, object list);
+
+enum {STATE_INIT, STATE_NUMBER, STATE_CHAINE_CHAR, STATE_CHAR, STATE_BOOLEAN, STATE_SYMBOL, STATE_EMPTY_LIST};
 
 #ifdef __cplusplus
 }

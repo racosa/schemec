@@ -76,12 +76,10 @@ object make_symbol ( string symbol ){
     return t;
 }
 
-object make_pair ( object car, object cdr ){
+object make_pair ( void ){
 
     object t = make_object ( SFS_PAIR );
-
-    t->this.pair.car = car;
-    t->this.pair.cdr = cdr;
+    t->this.pair.cdr = nil;
 
     return t;
 }
