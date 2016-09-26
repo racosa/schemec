@@ -152,7 +152,7 @@ int main ( int argc, char *argv[] ) {
 
         printf( "==> " );
         if(output->type == SFS_PAIR){
-          printf("( ");
+          printf("(");
         }
         sfs_print( output );
         printf( "\n" );
