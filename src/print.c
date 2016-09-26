@@ -18,76 +18,67 @@ void sfs_print_atom( object o ) {
 
       case SFS_NUMBER:
         /*printf( "SFS_NUMBER: %d", o->this.number.this.integer );*/
-        printf( "%d ", o->this.number.this.integer );
+        printf( "%d", o->this.number.this.integer );
       break;
 
       case SFS_CHARACTER:
         if( o->this.character == ' ' ){
           /*printf( "SFS_CHARACTER: #\\space " );*/
-          printf( "#\\space " );
+          printf( "#\\space" );
         }
         else if( o->this.character == '\n' ) {
           /*printf( "SFS_CHARACTER: #\\newline " );*/
-          printf( "#\\newline " );
+          printf( "#\\newline" );
         }
         else{
           /*printf( "SFS_CHARACTER: %c", o->this.character );*/
-          printf( "#\\%c ", o->this.character );
+          printf( "#\\%c", o->this.character );
         }
       break;
 
       case SFS_STRING:
         /*printf( "SFS_STRING: %s", o->this.string );*/
-        printf( "%s ", o->this.string );
+        printf( "%s", o->this.string );
       break;
 
       case SFS_BOOLEAN:
         if( o == true ){
             /*printf( "SFS_BOOLEAN: #t" );*/
-            printf( "#t " );
+            printf( "#t" );
         }
         else if( o == false ){
             /*printf( "SFS_BOOLEAN: #f" );*/
-            printf( "#f " );
+            printf( "#f" );
         }
       break;
 
       case SFS_SYMBOL:
         /*printf( "SFS_SYMBOL: %s", o->this.symbol );*/
-        printf( "%s ", o->this.symbol );
+        printf( "%s", o->this.symbol );
       break;
 
       case SFS_NIL:
         /*printf("SFS_NIL: ()");*/
-        printf("() ");
+        printf("()");
       break;
-
       default:
-        ERROR_MSG("ERROR print_atom");
+        ERROR_MSG("EXCEPTION in print_atom() function");
       break;
     }
     return;
 }
 
 void sfs_print_pair( object o ) {
-
-  /*  if(o->root_node == 1 | o->this.pair.car->type == SFS_PAIR){
-      printf("( " );
-      sfs_print(o->this.pair.car);
-    }
-    */
+    printf(" ");
     if(o->this.pair.car->type == SFS_PAIR ){
-      printf("( " );
+      printf("(");
       sfs_print(o->this.pair.car);
     }
-
     else{
       sfs_print(o->this.pair.car);
     }
-
-/*    sfs_print(o->this.pair.car); */
     if (o->this.pair.cdr == nil){
-      printf(") ");
+      printf(" )");
     }
     else {
       sfs_print(o->this.pair.cdr);
@@ -96,12 +87,10 @@ void sfs_print_pair( object o ) {
 }
 
 void sfs_print( object o ) {
-
     if ( SFS_PAIR == o->type ) {
         sfs_print_pair( o );
     }
     else {
         sfs_print_atom( o );
     }
-
 }
