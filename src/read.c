@@ -294,13 +294,9 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
 
 object sfs_read( char *input, uint *here ) {
 
-    DEBUG_MSG("Testing: %d", '	');
-    /*input = first_usefull_char(input);*/
     while(isspace(input[*here])){
       (*here)++;
     }
-    DEBUG_MSG("sfs_read input = %s", input);
-
     if ( input[*here] == '(' ) {
         if ( input[(*here)+1] == ')' ) {
             *here += 2;
@@ -309,7 +305,7 @@ object sfs_read( char *input, uint *here ) {
         }
         else {
             (*here)++;
-            while(isspace(input[*here])){
+            while(isspace(input[*here])){  /*Catching spaced nil*/
               (*here)++;
               if ( input[(*here)] == ')' ) {
                 (*here)++;
@@ -371,7 +367,7 @@ object sfs_read_atom( char *input, uint *here ) {
           break;
 
         case STATE_NUMBER:
-          if( input [ (*here) ] == '\0' || input [ (*here) ] == ' ' || input [ (*here) ] == ')' ){
+          if( input [ (*here) ] == '\0' || input [ (*here) ] == ' ' || input [ (*here) ] == ')' || input [ (*here) ] == '('){
             atom_size = (*here)- here_init + 1;
             init_string(atom_input);
             strncpy( atom_input, &input[here_init], atom_size );
@@ -384,8 +380,11 @@ object sfs_read_atom( char *input, uint *here ) {
 
         case STATE_CHAINE_CHAR:
 
-          if( input [ (*here) ] == '\"'){
-            if(input [ (*here) + 1 ] == '\0' || input [ (*here) + 1 ] == ' ' || input [ (*here)+1 ] == ')'){
+          if( input [ (*here) ] == '\"' ){
+            if( input [ (*here) - 1 ] == '\\' ){      /*Catching escaped " char exception.*/
+              memmove(&input[ (*here) - 1 ], &input[ (*here) ], strlen(input) - 1);
+            }
+            else if(input [ (*here) + 1 ] == '\0' || input [ (*here) + 1 ] == ' ' || input [ (*here)+1 ] == ')'){
               atom_size = (*here)- here_init + 1;
               init_string(atom_input);
               strncpy( atom_input, &input[here_init], atom_size );
@@ -408,8 +407,7 @@ object sfs_read_atom( char *input, uint *here ) {
               DEBUG_MSG("Atome identified of type: SFS_BOOLEAN -> Value: false " );
               atom_found = TRUE;
             }
-            else if( input[ (*here) ] == '\\' ){
-              /*Catching closing parentesis char exception.*/
+            else if( input[ (*here) ] == '\\' ){       /*Catching closing parentesis char exception.*/
               state = STATE_CHAR;
             }
           }
@@ -423,32 +421,41 @@ object sfs_read_atom( char *input, uint *here ) {
           break;
 
         case STATE_CHAR:
-          if( !strncmp( &input[*here], "space", 5 ) && ( input[ (*here) + 5 ] == '\0' || input [ (*here) + 5 ] == ' ' || input [ (*here) + 5 ] == ')') ){
+          if( !strncmp( &input[*here], "space", 5 ) && ( input[ (*here) + 5 ] == END_OF_STRING
+          || input [ (*here) + 5 ] == SPACE || input [ (*here) + 5 ] == OPENING_PARENTHESIS
+          || input [ (*here) + 5 ] == CLOSING_PARENTHESIS) ){
             atom = make_character( ' ' );
             DEBUG_MSG("Atome identified of type: SFS_CHARACTER -> Value: #\\space " );
             atom_found = TRUE;
             DEBUG_MSG("input[*here] = %c", input[*here]);
             (*here)+=4;
           }
-          else if( !strncmp( &input[*here], "newline", 7 ) && ( input[ (*here) + 7 ] == '\0' || input [ (*here) + 7 ] == ' ' ) ){
+          else if( !strncmp( &input[*here], "newline", 7 ) && ( input[ (*here) + 7 ] == END_OF_STRING
+          || input [ (*here) + 7 ] == SPACE || input [ (*here) + 7 ] == OPENING_PARENTHESIS
+          || input [ (*here) + 7 ] == CLOSING_PARENTHESIS ) ){
             atom = make_character( '\n' );
             DEBUG_MSG("Atome identified of type: SFS_CHARACTER -> Value: #\\newline " );
             atom_found = TRUE;
             (*here)+=6;
           }
-          else if( input[ (*here) ] != '\0' && ( input[ (*here)+1 ] == '\0' || input [ (*here)+1 ] == ' '|| input [ (*here)+1 ] == ')' ) ){
+          else if( input[ (*here) ] != END_OF_STRING && ( input[ (*here) + 1 ] == END_OF_STRING
+          || input [ (*here) + 1 ] == SPACE || input [ (*here) + 1 ] == OPENING_PARENTHESIS
+          || input [ (*here) + 1 ] == CLOSING_PARENTHESIS ) ){
             atom = make_character( input[ (*here) ] );
             DEBUG_MSG("Atome identified of type: SFS_CHARACTER -> Value: %c ", atom->this.character );
             atom_found = TRUE;
           }
-          else if ( input[ (*here) ] != '\0' || input [ (*here) ] == ' ' || input [ (*here) ] == ')' ){
+          else if ( input[ (*here) ] != END_OF_STRING || input [ (*here) ] == SPACE
+          || input [ (*here) ] == OPENING_PARENTHESIS || input [ (*here) ] == CLOSING_PARENTHESIS ){
             WARNING_MSG("ERROR: invalid atom type");
             return 0;
           }
           break;
 
         case STATE_SYMBOL:
-          if( input[ (*here) ] == '\0' || input [ (*here) ] == ' ' || input [ (*here) ] == ')' ){
+          if( input[ (*here) ] == END_OF_STRING || input [ (*here) ] == SPACE
+          || input [ (*here) ] == CLOSING_PARENTHESIS || input [ (*here) ] == OPENING_PARENTHESIS ){
+
             atom_size = (*here)- here_init;
             init_string(atom_input);
             strncpy(atom_input, &input[here_init], atom_size);
@@ -469,7 +476,7 @@ object sfs_read_atom( char *input, uint *here ) {
           return 0;
           break;
       }
-      if(input[*here] != ')'){
+      if(input[*here] != OPENING_PARENTHESIS && input[*here] != CLOSING_PARENTHESIS){
         (*here)++;
       }
       else if (state == STATE_CHAINE_CHAR || state == STATE_CHAR || state == STATE_BOOLEAN || state == STATE_INIT){
