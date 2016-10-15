@@ -45,7 +45,7 @@ typedef struct object_t {
 object make_object( uint type );
 object make_nil( void );
 object make_boolean( void ); /* why make_boolean(uint number)? */
-object make_integer ( int integer );
+object make_number ( double number, int num_type );
 object make_character( char character );
 object make_string ( string string );
 object make_symbol ( string symbol );

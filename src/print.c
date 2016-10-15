@@ -18,8 +18,21 @@ void sfs_print_atom( object o ) {
 
       case SFS_NUMBER:
         /*printf( "SFS_NUMBER: %d", o->this.number.this.integer );*/
-        printf( "%d", o->this.number.this.integer );
-      break;
+        switch (o->this.number.numtype) {
+          case NUM_PINFTY:
+            printf( "+inf" );
+          break;
+          case NUM_MINFTY:
+            printf( "-inf" );
+          break;
+          case NUM_INTEGER:
+            printf( "%d", o->this.number.this.integer );
+          break;
+          default:
+            printf( "%lf", o->this.number.this.real );
+          break;
+        }
+        break;
 
       case SFS_CHARACTER:
         if( o->this.character == ' ' ){
@@ -54,7 +67,9 @@ void sfs_print_atom( object o ) {
 
       case SFS_SYMBOL:
         /*printf( "SFS_SYMBOL: %s", o->this.symbol );*/
+        DEBUG_MSG("Printing symbol...");
         printf( "%s", o->this.symbol );
+        DEBUG_MSG("Printing symbol completed.");
       break;
 
       case SFS_NIL:

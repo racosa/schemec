@@ -7,5 +7,4 @@
 ==> "a string with some parenthesis inside # ("
 ==> "a string with some parenthesis inside ) ( plop"
 ==> "a string with some parenthesis inside ( ) (()))"
-==> "another string with escaped double quote \" "
 ==> "semi colon inside a string is not a comment ; ; ;  "
