@@ -34,6 +34,4 @@
 # Debug files
 *.dSYM/
 *.su
-
-# Test files
-*.out
+*.dbg

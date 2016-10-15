@@ -69,7 +69,7 @@ void sfs_print_atom( object o ) {
 }
 
 void sfs_print_pair( object o ) {
-    printf(" ");
+
     if(o->this.pair.car->type == SFS_PAIR ){
       printf("(");
       sfs_print(o->this.pair.car);
@@ -78,11 +78,13 @@ void sfs_print_pair( object o ) {
       sfs_print(o->this.pair.car);
     }
     if (o->this.pair.cdr == nil){
-      printf(" )");
+      printf(")");
     }
     else {
+      printf(" ");
       sfs_print(o->this.pair.cdr);
     }
+
     return;
 }
 
