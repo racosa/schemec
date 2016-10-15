@@ -16,7 +16,8 @@ extern "C" {
 #endif
 
 #include <string.h>
-
+#include <limits.h>
+#include <errno.h>
 #include "notify.h"
 
 

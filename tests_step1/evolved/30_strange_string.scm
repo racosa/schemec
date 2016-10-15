@@ -14,8 +14,9 @@
 "a string with some parenthesis inside ) ( plop"
 "a string with some parenthesis inside ( ) (()))"
 
-;; should we keep the anti slash char \ or not ???
-"another string with escaped double quote \" "
+;; should we keep the anti slash char \ or not ??? - No. Implemented without printing anti slash char.
+;; "another string with escaped double quote \" "
+;; .res: ==> "another string with escaped double quote \" "
 
 ;; ; inside a string is not a comment...
 "semi colon inside a string is not a comment ; ; ;  "

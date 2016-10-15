@@ -39,13 +39,17 @@ object make_boolean( void ){
     return t;
 }
 
-object make_integer( int integer ) {
+object make_number( double number, int num_type ) {
 
     object t = make_object( SFS_NUMBER );
 
-    t->this.number.numtype= NUM_INTEGER;
-    t->this.number.this.integer = integer;
-
+    t->this.number.numtype = num_type;
+    if(num_type == NUM_INTEGER){
+      t->this.number.this.integer = (int) number;
+    }
+    else{
+      t->this.number.this.real = number;
+    }
     return t;
 }
 

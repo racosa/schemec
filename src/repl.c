@@ -126,7 +126,9 @@ int main ( int argc, char *argv[] ) {
         /*continue;*/
 
         here  = 0;
+        DEBUG_MSG("Reading Sexpr...");
         sexpr = sfs_read( input, &here );
+        DEBUG_MSG("Reading Sexpr completed.");
         if ( NULL == sexpr ) {
             /* si fichier alors on sort*/
             if (mode == SCRIPT) {
