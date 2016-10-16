@@ -17,7 +17,6 @@ extern "C" {
 
 #include "number.h"
 
-
 typedef struct object_t {
 
     uint type;
@@ -41,7 +40,6 @@ typedef struct object_t {
 
 } *object;
 
-
 object make_object( uint type );
 object make_nil( void );
 object make_boolean( void ); /* why make_boolean(uint number)? */
@@ -50,6 +48,8 @@ object make_character( char character );
 object make_string ( string string );
 object make_symbol ( string symbol );
 object make_pair ( void );
+object car ( object object );
+object cdr ( object object );
 
 #define SFS_NUMBER       0x00
 #define SFS_CHARACTER    0x01

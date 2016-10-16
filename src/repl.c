@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 
-
+#include "environment.h"
 #include "object.h"
 #include "read.h"
 #include "eval.h"
@@ -29,15 +29,16 @@ void usage_error( char *command ) {
     fprintf( stderr, "Usage: %s [file.scm]\n   If no file is given, executes in Shell mode.\n", command );
 }
 
-
+object environment;
 object nil;
 object true;
 object false;
 
 void init_interpreter ( void ) {
 
-    nil      = make_nil();
-    true = make_boolean();
+    environment = make_top_level_environment();
+    nil   = make_nil();
+    true  = make_boolean();
     false = make_boolean();
 }
 
@@ -126,9 +127,9 @@ int main ( int argc, char *argv[] ) {
         /*continue;*/
 
         here  = 0;
-        DEBUG_MSG("Reading Sexpr...");
+        DEBUG_MSG("---------------------- Reading Sexpr (...) ----------------------");
         sexpr = sfs_read( input, &here );
-        DEBUG_MSG("Reading Sexpr completed.");
+        DEBUG_MSG("---------------------- Reading completed ------------------------");
         if ( NULL == sexpr ) {
             /* si fichier alors on sort*/
             if (mode == SCRIPT) {
@@ -139,8 +140,9 @@ int main ( int argc, char *argv[] ) {
             /*sinon on rend la main à l'utilisateur*/
             continue ;
         }
-
+        DEBUG_MSG("---------------------- Evaluating Sexpr (...) -------------------");
         output = sfs_eval( sexpr );
+        DEBUG_MSG("---------------------- Evaluation completed ---------------------");
         if( NULL == output) {
             /* si fichier alors on sort*/
             if (mode == SCRIPT) {
@@ -151,7 +153,7 @@ int main ( int argc, char *argv[] ) {
             /*sinon on rend la main à l'utilisateur*/
             continue ;
         }
-
+        DEBUG_MSG("---------------------- Printing result (...) ----------------------");
         printf( "==> " );
         if(output->type == SFS_PAIR){
           printf("(");
