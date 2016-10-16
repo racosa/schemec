@@ -14,7 +14,6 @@
 
 object sfs_eval( object input ) {
 
-  if(false){
     /* auto-evaluation */
     if(input->type == SFS_NUMBER || input->type == SFS_CHARACTER
        || input->type == SFS_STRING || input->type == SFS_BOOLEAN){
@@ -22,36 +21,54 @@ object sfs_eval( object input ) {
        }
 
     else{
+
         if(input->type == SFS_PAIR){
 
           if( is_quote(car(input)) ){
             if( cdr(cdr(input)) == nil ){
-              DEBUG_MSG("# Quote forme detected");
-              if( car(cdr(input))->type == SFS_PAIR && car(car(cdr(input)))->type == SFS_SYMBOL ){
-                return car(car(cdr(input)));
-              }
+              DEBUG_MSG("# quote forme detected");
               return car(cdr(input));
             }
             else{
               WARNING_MSG("Wrong type to apply");
-              return 0;
+              return NULL;
             }
 
           }
 
           else if(is_define(car(input))){
-            DEBUG_MSG("# Define forme detected");
+            DEBUG_MSG("# define forme detected");
             object symbol = make_pair();
             symbol->this.pair.car = NULL;
             symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
             if(cdr(car(symbol)) != nil ){
-              DEBUG_MSG("# Variable already exists in top level environment, modyfing..");
-              return symbol->this.pair.car->this.pair.cdr = car(cdr(cdr(input)));
+              DEBUG_MSG("# Variable already exists in top level environment, modyfing.. ");
+              symbol->this.pair.car->this.pair.cdr = car(cdr(cdr(input)));
+              return car(car(symbol));
             }
             else{
-              return symbol->this.pair.car->this.pair.cdr = car(cdr(cdr(input)));
+              symbol->this.pair.car->this.pair.cdr = car(cdr(cdr(input)));
+              return car(car(symbol));
             }
-            return input;
+            return NULL;
+          }
+
+          else if(is_set(car(input))){
+            DEBUG_MSG("# set! forme detected");
+            object symbol = make_pair();
+            symbol->this.pair.car = NULL;
+            symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
+
+            if(cdr(car(symbol)) != nil){
+              object old_symbol_value = make_object(cdr(car(symbol))->type);
+              old_symbol_value = cdr(car(symbol));
+              symbol->this.pair.car->this.pair.cdr = car(cdr(cdr(input)));
+              return old_symbol_value;
+            }
+            else{
+              WARNING_MSG("Undefined variable");
+              return nil;
+            }
           }
 
           else if(car(input)->type == SFS_SYMBOL){
@@ -62,7 +79,7 @@ object sfs_eval( object input ) {
               return cdr(car(symbol));
             }
             WARNING_MSG("# Unbound variable: %s", car(car(symbol))->this.symbol );
-            return 0;
+            return NULL;
           }
 
 
@@ -71,9 +88,9 @@ object sfs_eval( object input ) {
             return input;
           }
       }
+      WARNING_MSG("Primitive forme missing arguments");
+      return NULL;
     }
-
-} return input;
 
 }
 
@@ -91,8 +108,22 @@ int is_define( object object ){
   return FALSE;
 }
 
+int is_set( object object ){
+  if ( !strcmp(object->this.symbol, "set!" ) ){
+    return TRUE;
+  }
+  return FALSE;
+}
+
+int is_if( object object ){
+  if ( !strcmp(object->this.symbol, "if" ) ){
+    return TRUE;
+  }
+  return FALSE;
+}
+
 int is_forme(object symbol){
-    if(is_quote(symbol) || is_define(symbol)){
+    if(is_quote(symbol) || is_define(symbol) || is_set(symbol)){
       return TRUE;
     }
     return FALSE;

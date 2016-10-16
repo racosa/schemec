@@ -9,7 +9,7 @@
  */
 
 #include "print.h"
-
+#include "eval.h"
 #include <stdio.h>
 
 void sfs_print_atom( object o ) {
@@ -85,19 +85,19 @@ void sfs_print_atom( object o ) {
 
 void sfs_print_pair( object o ) {
 
-    if(o->this.pair.car->type == SFS_PAIR ){
+    if(car(o)->type == SFS_PAIR && car(car(o))->type != SFS_SYMBOL){ /*Fixing print of symbols that belong to the environment*/
       printf("(");
-      sfs_print(o->this.pair.car);
+      sfs_print(car(o));
     }
     else{
-      sfs_print(o->this.pair.car);
+      sfs_print(car(o));
     }
     if (o->this.pair.cdr == nil){
       printf(")");
     }
     else {
       printf(" ");
-      sfs_print(o->this.pair.cdr);
+      sfs_print(cdr(o));
     }
 
     return;
@@ -105,8 +105,19 @@ void sfs_print_pair( object o ) {
 
 void sfs_print( object o ) {
     if ( SFS_PAIR == o->type ) {
-      
-        sfs_print_pair( o );
+
+      if(car(o)->type == SFS_SYMBOL){  /*Fixing print of symbols that belong to the environment*/
+        if(is_forme(car(o))){
+          printf("(");
+          sfs_print_pair(o);
+        }
+        else{
+          sfs_print_atom(car(o));
+        }
+      }
+      else{
+          sfs_print_pair( o );
+      }
     }
     else {
         sfs_print_atom( o );

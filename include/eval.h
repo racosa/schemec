@@ -22,6 +22,7 @@ object sfs_eval( object );
 int is_forme(object symbol);
 int is_quote(object object);
 int is_define( object object );
+int is_set( object object );
 
 #ifdef __cplusplus
 }

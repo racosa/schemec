@@ -159,9 +159,12 @@ int main ( int argc, char *argv[] ) {
         }
         DEBUG_MSG("---------------------- Printing result (...) --------------------");
         printf( "==> " );
-        if(output->type == SFS_PAIR){
+        
+        /*Fixing print of symbols that belong to the environment*/
+        if(output->type == SFS_PAIR && car(output)->type != SFS_SYMBOL){
           printf("(");
         }
+
         sfs_print( output );
         printf( "\n" );
     }
