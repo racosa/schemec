@@ -19,6 +19,7 @@ extern "C" {
 #include "object.h"
 
 object sfs_eval( object );
+int is_forme(object symbol);
 int is_quote(object object);
 int is_define( object object );
 

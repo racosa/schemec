@@ -35,8 +35,12 @@ object true;
 object false;
 
 void init_interpreter ( void ) {
-
+  environment = make_pair();
+  environment->this.pair.car = make_pair();
+  environment->this.pair.car = NULL;
+    /*
     environment = make_top_level_environment();
+*/
     nil   = make_nil();
     true  = make_boolean();
     false = make_boolean();
@@ -153,7 +157,7 @@ int main ( int argc, char *argv[] ) {
             /*sinon on rend la main à l'utilisateur*/
             continue ;
         }
-        DEBUG_MSG("---------------------- Printing result (...) ----------------------");
+        DEBUG_MSG("---------------------- Printing result (...) --------------------");
         printf( "==> " );
         if(output->type == SFS_PAIR){
           printf("(");

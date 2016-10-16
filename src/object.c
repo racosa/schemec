@@ -11,6 +11,7 @@
 #include "object.h"
 #include "mem.h"
 #include "environment.h"
+#include "eval.h"
 
 
 object make_object( uint type ) {
@@ -73,30 +74,38 @@ object make_string ( string string ){
 }
 
 object make_symbol ( string symbol ){
-    object symbol_index = make_pair();
+
     object symbol_name = make_object(SFS_SYMBOL);
     strcpy( symbol_name-> this.symbol, symbol );
+
+/*TODO Correct multiple equal formes*/
+    if(is_forme(symbol_name)){
+      DEBUG_MSG( "# Primitive forme \" %s \" detected", symbol_name->this.symbol );
+      return symbol_name;
+    }
+
+    object symbol_index = make_pair();
     object symbol_pair = make_pair();
+    symbol_pair->this.pair.car = make_object(SFS_SYMBOL);
     symbol_pair->this.pair.car = symbol_name;
+    symbol_index->this.pair.car = make_pair();
     symbol_index->this.pair.car = symbol_pair;
 
-    if(car(environment)){
-      symbol_index = search_symbol_in_environment(environment, symbol);
+    if(car(environment) != NULL){
+      symbol_index = search_symbol_in_environment( symbol);
       if (symbol_index){
-        DEBUG_MSG("# Symbol \" %s \" already exists", car(car(symbol_index))->this.symbol);
-        return car(car(symbol_index));
+        return car(symbol_index);
       }
     }
-    symbol_index = insert_symbol_in_environment(environment, symbol_pair);
-    DEBUG_MSG("# New symbol inserted in top level environment: %s ", car(car(symbol_index))->this.symbol);
-    return car(car(symbol_index));
+    symbol_index = insert_symbol_in_environment( symbol_pair);
+    return car(symbol_index);
 }
 
 object make_pair ( void ){
 
     object t = make_object ( SFS_PAIR );
-    t->this.pair.car = NULL;
-    t->this.pair.cdr = nil;
+/*    t->this.pair.car = NULL;
+*/    t->this.pair.cdr = nil;
 
     return t;
 }

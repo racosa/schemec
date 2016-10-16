@@ -523,6 +523,7 @@ object sfs_read_atom( char *input, uint *here ) {
 object sfs_read_pair( char *stream, uint *i ) {
 
     object pair = make_pair();
+    pair->this.pair.car = NULL;
     object next_object;
 
     while (*i < strlen(stream)) {
@@ -539,7 +540,7 @@ object sfs_read_pair( char *stream, uint *i ) {
         if (next_object){
           DEBUG_MSG("# Inserting object in tree..");
           insert_object_in_tree( next_object, pair );
-          DEBUG_MSG("# Inserting completed");
+          DEBUG_MSG("# Insertion completed");
           while (isspace(stream[*i]) || stream[*i] == '\t'){
               (*i)++;
           }

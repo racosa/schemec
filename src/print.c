@@ -105,6 +105,7 @@ void sfs_print_pair( object o ) {
 
 void sfs_print( object o ) {
     if ( SFS_PAIR == o->type ) {
+      
         sfs_print_pair( o );
     }
     else {

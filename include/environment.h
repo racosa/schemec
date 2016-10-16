@@ -19,8 +19,8 @@ extern "C" {
 extern object environment;
 
 object make_top_level_environment( void );
-object insert_symbol_in_environment( object environment, object symbol_pair );
-object search_symbol_in_environment( object environment, string symbol );
+object insert_symbol_in_environment( object symbol_pair );
+object search_symbol_in_environment( string symbol );
 
 #ifdef __cplusplus
 }
