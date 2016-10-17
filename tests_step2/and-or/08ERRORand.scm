@@ -1,8 +1,5 @@
 ; TEST_RETURN_CODE=FAIL
-; TEST_COMMENT="It's not possible use define in And/Or function"
+; TEST_COMMENT="Error set avant le define avec and"
 
-(and (define x 2) 345 #f (quote 4))
-
-
-
+(and (if #t (quote #t) (quote #f)) (set! x 3))
 
