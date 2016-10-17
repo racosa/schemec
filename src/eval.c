@@ -37,7 +37,6 @@ object sfs_eval( object input ) {
           }
 
           /* Implementing define forme evaluation. */
-          /* TODO Implement variable atribuition to another variable*/
           else if(is_define(car(input))){
             DEBUG_MSG("# \" define \" forme detected");
             object symbol = make_pair();
@@ -45,11 +44,11 @@ object sfs_eval( object input ) {
             symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
             if(cdr(car(symbol)) != nil ){
               DEBUG_MSG("# Variable already exists in top level environment, modyfing.. ");
-              symbol->this.pair.car->this.pair.cdr = car(cdr(cdr(input)));
+              symbol->this.pair.car->this.pair.cdr = sfs_eval(car(cdr(cdr(input))));
               return car(car(symbol));
             }
             else{
-              symbol->this.pair.car->this.pair.cdr = car(cdr(cdr(input)));
+              symbol->this.pair.car->this.pair.cdr = sfs_eval(car(cdr(cdr(input))));
               return car(car(symbol));
             }
             return NULL;
@@ -65,7 +64,7 @@ object sfs_eval( object input ) {
             if(cdr(car(symbol)) != nil){
               object old_symbol_value = make_object(cdr(car(symbol))->type);
               old_symbol_value = cdr(car(symbol));
-              symbol->this.pair.car->this.pair.cdr = car(cdr(cdr(input)));
+              symbol->this.pair.car->this.pair.cdr = sfs_eval(car(cdr(cdr(input))));
               return old_symbol_value;
             }
             else{
@@ -117,7 +116,7 @@ object sfs_eval( object input ) {
             return sfs_eval(car(input));
           }
 
-          /* Implementing = signal evaluation. */
+          /* Implementing = operand evaluation. */
           /* TODO Implement multiple arguments evaluation */
           else if(is_equal(car(input))){
             DEBUG_MSG("# \" = \" signal detected");
