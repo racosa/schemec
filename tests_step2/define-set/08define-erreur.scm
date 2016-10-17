@@ -3,3 +3,4 @@
 ; TEST_COMMENT="Test erreur define"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define x)
+

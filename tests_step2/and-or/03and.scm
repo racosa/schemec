@@ -4,5 +4,3 @@
 (define x #f)
 (and 45 0 x 89)
 
-
-
