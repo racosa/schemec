@@ -13,8 +13,8 @@
 #include "environment.h"
 
 object sfs_eval( object input ) {
-
-    /* auto-evaluation */
+    eval:
+    /* Implementing auto-evaluation */
     if(input->type == SFS_NUMBER || input->type == SFS_CHARACTER
        || input->type == SFS_STRING || input->type == SFS_BOOLEAN){
          return input;
@@ -24,18 +24,20 @@ object sfs_eval( object input ) {
 
         if(input->type == SFS_PAIR){
 
+          /* Implementing quote forme evaluation. */
           if( is_quote(car(input)) ){
             if( cdr(cdr(input)) == nil ){
               DEBUG_MSG("# quote forme detected");
               return car(cdr(input));
             }
             else{
-              WARNING_MSG("Wrong type to apply");
+              WARNING_MSG("Primitive forme with missing or extra arguments");
               return NULL;
             }
-
           }
 
+          /* Implementing define forme evaluation. */
+          /* TODO Implement variable atribuition to another variable*/
           else if(is_define(car(input))){
             DEBUG_MSG("# define forme detected");
             object symbol = make_pair();
@@ -53,6 +55,7 @@ object sfs_eval( object input ) {
             return NULL;
           }
 
+          /* Implementing set! forme evaluation. */
           else if(is_set(car(input))){
             DEBUG_MSG("# set! forme detected");
             object symbol = make_pair();
@@ -70,29 +73,52 @@ object sfs_eval( object input ) {
               return nil;
             }
           }
+          /* Implementing if forme evaluation. */
+          else if(is_if(car(input))){
+            if(cdr(cdr(cdr(cdr(input)))) == nil){
 
-          else if(car(input)->type == SFS_SYMBOL){
-            object symbol;
-            symbol = search_symbol_in_environment( car(input)->this.symbol );
-            if(cdr(car(symbol)) != nil  ){
-              DEBUG_MSG("# Variable found in top level environment");
-              return cdr(car(symbol));
+
+              DEBUG_MSG("# if forme detected");
+              if(sfs_eval(car(cdr(input))) != false){
+                DEBUG_MSG("# (predicate) is (true), evaluating (consequence)");
+                input = car(cdr(cdr(input)));
+              }
+              else{
+                DEBUG_MSG("# (predicate) is (false), evaluating (alternative)");
+                input = car(cdr(cdr(cdr(input))));
+              }
+              /*Goto begin of eval function*/
+              goto eval;
             }
-            WARNING_MSG("# Unbound variable: %s", car(car(symbol))->this.symbol );
-            return NULL;
           }
+            /* Implementing symbol evaluation. */
+            else if(car(input)->type == SFS_SYMBOL){
+              object symbol;
+              symbol = search_symbol_in_environment( car(input)->this.symbol );
+              if(cdr(car(symbol)) != nil  ){
+                DEBUG_MSG("# Variable found in top level environment");
+                return cdr(car(symbol));
+              }
+              WARNING_MSG("# Unbound variable: %s", car(car(symbol))->this.symbol );
+              return NULL;
+            }
 
+            else{
+              WARNING_MSG("Primitive forme with missing or extra arguments");
+              return NULL;
+            }
 
+          }
           else{
             WARNING_MSG("# Wrong type to apply");
-            return input;
+            return NULL;
           }
       }
-      WARNING_MSG("Primitive forme missing arguments");
+      WARNING_MSG("Primitive forme with missing or extra arguments");
       return NULL;
     }
 
-}
+
 
 int is_quote( object object ){
   if ( !strcmp( object->this.symbol, "quote" ) || !strcmp( object->this.symbol, "\'" ) ){
@@ -123,7 +149,7 @@ int is_if( object object ){
 }
 
 int is_forme(object symbol){
-    if(is_quote(symbol) || is_define(symbol) || is_set(symbol)){
+    if(is_quote(symbol) || is_define(symbol) || is_set(symbol) || is_if(symbol)){
       return TRUE;
     }
     return FALSE;

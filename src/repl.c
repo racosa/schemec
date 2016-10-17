@@ -134,6 +134,7 @@ int main ( int argc, char *argv[] ) {
         DEBUG_MSG("---------------------- Reading Sexpr (...) ----------------------");
         sexpr = sfs_read( input, &here );
         DEBUG_MSG("---------------------- Reading completed ------------------------");
+        DEBUG_MSG("                                                                 ");
         if ( NULL == sexpr ) {
             /* si fichier alors on sort*/
             if (mode == SCRIPT) {
@@ -147,6 +148,7 @@ int main ( int argc, char *argv[] ) {
         DEBUG_MSG("---------------------- Evaluating Sexpr (...) -------------------");
         output = sfs_eval( sexpr );
         DEBUG_MSG("---------------------- Evaluation completed ---------------------");
+        DEBUG_MSG("                                                                 ");
         if( NULL == output) {
             /* si fichier alors on sort*/
             if (mode == SCRIPT) {
@@ -159,7 +161,7 @@ int main ( int argc, char *argv[] ) {
         }
         DEBUG_MSG("---------------------- Printing result (...) --------------------");
         printf( "==> " );
-        
+
         /*Fixing print of symbols that belong to the environment*/
         if(output->type == SFS_PAIR && car(output)->type != SFS_SYMBOL){
           printf("(");

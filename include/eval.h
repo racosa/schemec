@@ -23,6 +23,7 @@ int is_forme(object symbol);
 int is_quote(object object);
 int is_define( object object );
 int is_set( object object );
+int is_if( object object );
 
 #ifdef __cplusplus
 }
