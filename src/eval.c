@@ -11,198 +11,249 @@
 #include "eval.h"
 #include "object.h"
 #include "environment.h"
+#include "mem.h"
 
 object sfs_eval( object input ) {
     eval:
-    /* Implementing auto-evaluation */
-    if(input->type == SFS_NUMBER || input->type == SFS_CHARACTER
-       || input->type == SFS_STRING || input->type == SFS_BOOLEAN){
-         return input;
-       }
+    if(input){
+      /* Implementing auto-evaluation */
+      if(input->type == SFS_NUMBER || input->type == SFS_CHARACTER
+         || input->type == SFS_STRING || input->type == SFS_BOOLEAN || input->type == SFS_NIL){
+           return input;
+         }
 
-    else{
+      else{
 
-        if(input->type == SFS_PAIR){
+          if(input->type == SFS_PAIR){
 
-          /* Implementing quote forme evaluation. */
-          if( is_quote(car(input)) ){
-            if( cdr(cdr(input)) == nil ){
-              DEBUG_MSG("# \" quote \" forme detected");
-              return car(cdr(input));
-            }
-            else{
-              WARNING_MSG("Primitive forme with missing or extra arguments");
-              return NULL;
-            }
-          }
-
-          /* Implementing define forme evaluation. */
-          else if(is_define(car(input))){
-            DEBUG_MSG("# \" define \" forme detected");
-            object symbol = make_pair();
-            symbol->this.pair.car = NULL;
-            symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
-            if(cdr(car(symbol)) != nil ){
-              DEBUG_MSG("# Variable already exists in top level environment, modyfing.. ");
-              symbol->this.pair.car->this.pair.cdr = sfs_eval(car(cdr(cdr(input))));
-              return car(car(symbol));
-            }
-            else{
-              symbol->this.pair.car->this.pair.cdr = sfs_eval(car(cdr(cdr(input))));
-              return car(car(symbol));
-            }
-            return NULL;
-          }
-
-          /* Implementing set! forme evaluation. */
-          else if(is_set(car(input))){
-            DEBUG_MSG("# \" set! \" forme detected");
-            object symbol = make_pair();
-            symbol->this.pair.car = NULL;
-            symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
-
-            if(cdr(car(symbol)) != nil){
-              object old_symbol_value = make_object(cdr(car(symbol))->type);
-              old_symbol_value = cdr(car(symbol));
-              symbol->this.pair.car->this.pair.cdr = sfs_eval(car(cdr(cdr(input))));
-              return old_symbol_value;
-            }
-            else{
-              WARNING_MSG("Undefined variable");
-              return nil;
-            }
-          }
-
-          /* Implementing if forme evaluation. */
-          else if(is_if(car(input))){
-            if(cdr(cdr(cdr(cdr(input)))) == nil){
-              DEBUG_MSG("# \" if \" forme detected");
-              if(sfs_eval(car(cdr(input))) != false){
-                DEBUG_MSG("# (predicate) is (true), evaluating (consequence)");
-                input = car(cdr(cdr(input)));
+            /* Implementing quote forme evaluation. */
+            if( is_quote(car(input)) ){
+              if( cdr(cdr(input)) == nil ){
+                DEBUG_MSG("# \" quote \" forme detected");
+                return car(cdr(input));
               }
               else{
-                DEBUG_MSG("# (predicate) is (false), evaluating (alternative)");
-                input = car(cdr(cdr(cdr(input))));
+                WARNING_MSG("Primitive forme with missing or extra arguments");
+                return NULL;
               }
-              /*Goto begin of eval function*/
-              goto eval;
             }
-          }
 
-          /* Implementing and forme evaluation. */
-          else if(is_and(car(input))){
-            DEBUG_MSG("# \" and \" forme detected");
-            input = cdr(input);
-            while(cdr(input) != nil){
-              if(sfs_eval(car(input)) == false){
-                return false;
+            /* Implementing define forme evaluation. */
+            else if(is_define(car(input))){
+              if(cdr(cdr(cdr(input))) == nil){
+
+                DEBUG_MSG("# \" define \" forme detected");
+                object symbol = make_pair();
+                object symbol_value = sfs_malloc(sizeof(*symbol_value));
+                symbol->this.pair.car = NULL;
+
+                symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
+                if(cdr(car(symbol)) != nil ){
+                  DEBUG_MSG("# Variable already exists in top level environment, modyfing.. ");
+                  symbol_value = sfs_eval(car(cdr(cdr(input))));
+                  if(symbol_value) {
+                    symbol->this.pair.car->this.pair.cdr = symbol_value;
+                    return car(car(symbol));
+                  }
+                  else{
+                    return NULL;
+                  }
+
+                 }
+                 else{
+                  symbol_value = sfs_eval(car(cdr(cdr(input))));
+                  if(symbol_value){
+                    symbol->this.pair.car->this.pair.cdr = symbol_value;
+                    return car(car(symbol));
+                  }
+                  else{
+                    return NULL;
+                  }
+
+                 }
+
               }
+              else {
+                WARNING_MSG("Primitive forme with missing or extra arguments");
+                return NULL;
+              }
+            }
+
+            /* Implementing set! forme evaluation. */
+            else if(is_set(car(input))){
+              if(cdr(cdr(cdr(input))) == nil){
+                DEBUG_MSG("# \" set! \" forme detected");
+                object symbol = make_pair();
+                symbol->this.pair.car = NULL;
+                symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
+
+                if(cdr(car(symbol)) != nil){
+                  object old_symbol_value = make_object(cdr(car(symbol))->type);
+                  old_symbol_value = cdr(car(symbol));
+                  symbol->this.pair.car->this.pair.cdr = sfs_eval(car(cdr(cdr(input))));
+                  return old_symbol_value;
+                }
+                else{
+                  WARNING_MSG("Unbound variable");
+                  return NULL;
+                }
+              }
+              else {
+                WARNING_MSG("Primitive forme with missing or extra arguments");
+                return NULL;
+              }
+
+            }
+
+            /* Implementing if forme evaluation. */
+            else if(is_if(car(input))){
+              if(cdr(cdr(cdr(cdr(input)))) == nil){
+                DEBUG_MSG("# \" if \" forme detected");
+                if(sfs_eval(car(cdr(input))) != false){
+                  DEBUG_MSG("# (predicate) is (true), evaluating (consequence)");
+                  input = car(cdr(cdr(input)));
+                }
+                else{
+                  DEBUG_MSG("# (predicate) is (false), evaluating (alternative)");
+                  input = car(cdr(cdr(cdr(input))));
+                }
+                /*Goto begin of eval function*/
+                goto eval;
+              }
+              else {
+                WARNING_MSG("Primitive forme with missing or extra arguments");
+                return NULL;
+              }
+            }
+
+            /* Implementing and forme evaluation. */
+            else if(is_and(car(input))){
+              DEBUG_MSG("# \" and \" forme detected");
               input = cdr(input);
-            }
-            return sfs_eval(car(input));
-          }
+              while(cdr(input) != nil){
+                if(sfs_eval(car(input)) == false){
+                  return false;
+                }
+                input = cdr(input);
 
-          /* Implementing or forme evaluation. */
-          else if(is_or(car(input))){
-            DEBUG_MSG("# \" or \" forme detected");
-            input = cdr(input);
-            while(cdr(input) != nil){
-              if(sfs_eval(car(input)) != false){
+                if(input == NULL) { /* and without arguments */
+                  return true;
+                }
+              }
                 return sfs_eval(car(input));
               }
-              input = cdr(input);
-            }
-            return sfs_eval(car(input));
-          }
 
-          /* Implementing = operand evaluation. */
-          /* TODO Implement multiple arguments evaluation */
-          else if(is_equal(car(input))){
-            DEBUG_MSG("# \" = \" signal detected");
-            input = cdr( input );
-            if ( cdr(cdr( input )) == nil ){
-              if ( (sfs_eval(car( input )))->this.number.this.integer ==
-              (sfs_eval(car(cdr( input ))))->this.number.this.integer){
-                return true;
-              }
-              else{
+
+
+            /* Implementing or forme evaluation. */
+            else if(is_or(car(input))){
+              DEBUG_MSG("# \" or \" forme detected");
+              input = cdr(input);
+              if(car(input) == NULL){ /* or without arguments */
                 return false;
               }
-            }
-            else{
-              WARNING_MSG("Invalid math statement");
-              return NULL;
-            }
-          }
-
-          /* Implementing < signal evaluation. */
-          /* TODO Implement multiple arguments evaluation */
-          else if(is_smaller(car(input))){
-            DEBUG_MSG("# \" < \" signal detected");
-            input = cdr( input );
-      			if ( cdr(cdr( input )) == nil ){
-      				if ( (sfs_eval(car( input )))->this.number.this.integer <
-              (sfs_eval(car(cdr( input ))))->this.number.this.integer){
-      					return true;
-      				}
-      				else{
-      					return false;
-      				}
-      			}
-      			else{
-      				WARNING_MSG("Invalid math statement");
-      				return NULL;
-      			}
-          }
-
-          /* Implementing > signal evaluation. */
-          /* TODO Implement multiple arguments evaluation */
-          else if(is_bigger(car(input))){
-            DEBUG_MSG("# \" > \" signal detected");
-            input = cdr( input );
-      			if ( cdr(cdr( input )) == nil ){
-      				if ( (sfs_eval(car( input )))->this.number.this.integer >
-              (sfs_eval(car(cdr( input ))))->this.number.this.integer){
-      					return true;
-      				}
-      				else{
-      					return false;
-      				}
-      			}
-      			else{
-      				WARNING_MSG("Invalid math statement");
-      				return 0;
-      			}
-          }
-
-          /* TODO Implement addition, subtraction, multiplication and division evaluation */
-
-            /* Implementing symbol evaluation. */
-            else if(car(input)->type == SFS_SYMBOL){
-              object symbol;
-              symbol = search_symbol_in_environment( car(input)->this.symbol );
-              if(cdr(car(symbol)) != nil  ){
-                DEBUG_MSG("# Variable found in top level environment");
-                return cdr(car(symbol));
+              while(cdr(input) != nil){
+                if(sfs_eval(car(input)) != false){
+                  return sfs_eval(car(input));
+                }
+                input = cdr(input);
               }
-              WARNING_MSG("# Unbound variable: %s", car(car(symbol))->this.symbol );
-              return NULL;
+              return sfs_eval(car(input));
             }
 
+            /* Implementing = operand evaluation. */
+            /* TODO Implement multiple arguments evaluation */
+            else if(is_equal(car(input))){
+              DEBUG_MSG("# \" = \" signal detected");
+              input = cdr( input );
+              if ( cdr(cdr( input )) == nil ){
+                if ( (sfs_eval(car( input )))->this.number.this.integer ==
+                (sfs_eval(car(cdr( input ))))->this.number.this.integer){
+                  return true;
+                }
+                else{
+                  return false;
+                }
+              }
+              else{
+                WARNING_MSG("Invalid math statement");
+                return NULL;
+              }
+            }
+
+            /* Implementing < signal evaluation. */
+            /* TODO Implement multiple arguments evaluation */
+            else if(is_smaller(car(input))){
+              DEBUG_MSG("# \" < \" signal detected");
+              input = cdr( input );
+              if ( cdr(cdr( input )) == nil ){
+                if ( (sfs_eval(car( input )))->this.number.this.integer <
+                (sfs_eval(car(cdr( input ))))->this.number.this.integer){
+                  return true;
+                }
+                else{
+                  return false;
+                }
+              }
+              else{
+                WARNING_MSG("Invalid math statement");
+                return NULL;
+              }
+            }
+
+            /* Implementing > signal evaluation. */
+            /* TODO Implement multiple arguments evaluation */
+            else if(is_bigger(car(input))){
+              DEBUG_MSG("# \" > \" signal detected");
+              input = cdr( input );
+              if ( cdr(cdr( input )) == nil ){
+                if ( (sfs_eval(car( input )))->this.number.this.integer >
+                (sfs_eval(car(cdr( input ))))->this.number.this.integer){
+                  return true;
+                }
+                else{
+                  return false;
+                }
+              }
+              else{
+                WARNING_MSG("Invalid math statement");
+                return 0;
+              }
+            }
+
+            /* TODO Implement addition, subtraction, multiplication and division evaluation */
+
+              /* Implementing symbol evaluation. */
+              else if(car(input)->type == SFS_SYMBOL){
+                object symbol;
+                symbol = search_symbol_in_environment( car(input)->this.symbol );
+                if(cdr(car(symbol)) != nil  ){
+                  DEBUG_MSG("# Variable found in top level environment");
+                  return cdr(car(symbol));
+                }
+                WARNING_MSG("# Unbound variable: %s", car(car(symbol))->this.symbol );
+                return NULL;
+              }
+
+              else{
+                WARNING_MSG("Primitive forme with missing or extra arguments");
+                return NULL;
+              }
+
+            }
             else{
-              WARNING_MSG("Primitive forme with missing or extra arguments");
+              WARNING_MSG("# Wrong type to apply");
               return NULL;
             }
+        }
+        WARNING_MSG("Primitive forme with missing or extra arguments");
+        return NULL;
 
-          }
-          else{
-            WARNING_MSG("# Wrong type to apply");
-            return NULL;
-          }
-      }
-      WARNING_MSG("Primitive forme with missing or extra arguments");
+    }
+    else{
       return NULL;
+    }
+
     }
 
 

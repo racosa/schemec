@@ -300,16 +300,15 @@ object sfs_read( char *input, uint *here ) {
 
     if( input[ *here ] == '\'' && !isspace(input[*here + 1])){ /*Detecting quote forme.*/
       int index = 0;
-      string quote_input;
+      char quote_input[STRLEN];
       init_string(quote_input);
-      quote_input[0] = '\'';
-      quote_input[1] = ' ';
-      strcpy(&quote_input[2], &input[1]);
-      while(quote_input[index] != '\0'){
+      strcpy(quote_input, "(quote ");
+      strcpy(&quote_input[7], &input[*here+1]);
+      while(quote_input[index] != '\0' && quote_input[index] != ')'){
         index++;
       }
       quote_input[index] = ')';
-      return sfs_read_pair(quote_input, here );
+      return sfs_read(quote_input, here );
     }
 
     if ( input[*here] == '(' ) {

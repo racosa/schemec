@@ -111,19 +111,19 @@ object make_pair ( void ){
 }
 
 object car ( object object ){
-  if (object->type == SFS_PAIR){
-    return object->this.pair.car;
+  if(object){
+    if (object->type == SFS_PAIR){
+      return object->this.pair.car;
+    }
   }
-  else{
-    return NULL;
-  }
+  return NULL;
 }
 
 object cdr ( object object ){
-  if (object->type == SFS_PAIR){
-    return object->this.pair.cdr;
+  if(object){
+    if (object->type == SFS_PAIR){
+      return object->this.pair.cdr;
+    }
   }
-  else{
-    return NULL;
-  }
+  return NULL;
 }

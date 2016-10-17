@@ -13,7 +13,8 @@
 
 object make_top_level_environment( void ){
   environment = make_pair();
-  environment->this.pair.car = nil;
+  environment->this.pair.car = make_pair();
+  environment->this.pair.car = NULL;
   return environment;
 }
 
