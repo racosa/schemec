@@ -73,7 +73,7 @@ object sfs_eval( object input ) {
               return nil;
             }
           }
-          
+
           /* Implementing if forme evaluation. */
           else if(is_if(car(input))){
             if(cdr(cdr(cdr(cdr(input)))) == nil){
@@ -116,6 +116,68 @@ object sfs_eval( object input ) {
             }
             return sfs_eval(car(input));
           }
+
+          /* Implementing = signal evaluation. */
+          /* TODO Implement multiple arguments evaluation */
+          else if(is_equal(car(input))){
+            DEBUG_MSG("# \" = \" signal detected");
+            input = cdr( input );
+            if ( cdr(cdr( input )) == nil ){
+              if ( (sfs_eval(car( input )))->this.number.this.integer ==
+              (sfs_eval(car(cdr( input ))))->this.number.this.integer){
+                return true;
+              }
+              else{
+                return false;
+              }
+            }
+            else{
+              WARNING_MSG("Invalid math statement");
+              return NULL;
+            }
+          }
+
+          /* Implementing < signal evaluation. */
+          /* TODO Implement multiple arguments evaluation */
+          else if(is_smaller(car(input))){
+            DEBUG_MSG("# \" < \" signal detected");
+            input = cdr( input );
+      			if ( cdr(cdr( input )) == nil ){
+      				if ( (sfs_eval(car( input )))->this.number.this.integer <
+              (sfs_eval(car(cdr( input ))))->this.number.this.integer){
+      					return true;
+      				}
+      				else{
+      					return false;
+      				}
+      			}
+      			else{
+      				WARNING_MSG("Invalid math statement");
+      				return NULL;
+      			}
+          }
+
+          /* Implementing > signal evaluation. */
+          /* TODO Implement multiple arguments evaluation */
+          else if(is_bigger(car(input))){
+            DEBUG_MSG("# \" > \" signal detected");
+            input = cdr( input );
+      			if ( cdr(cdr( input )) == nil ){
+      				if ( (sfs_eval(car( input )))->this.number.this.integer >
+              (sfs_eval(car(cdr( input ))))->this.number.this.integer){
+      					return true;
+      				}
+      				else{
+      					return false;
+      				}
+      			}
+      			else{
+      				WARNING_MSG("Invalid math statement");
+      				return 0;
+      			}
+          }
+
+          /* TODO Implement addition, subtraction, multiplication and division evaluation */
 
             /* Implementing symbol evaluation. */
             else if(car(input)->type == SFS_SYMBOL){
@@ -188,9 +250,62 @@ int is_or( object object ){
   return FALSE;
 }
 
+int is_equal( object object ){
+  if ( !strcmp(object->this.symbol, "=" ) ){
+    return TRUE;
+  }
+  return FALSE;
+}
+
+int is_smaller( object object ){
+  if ( !strcmp(object->this.symbol, "<" ) ){
+    return TRUE;
+  }
+  return FALSE;
+}
+
+int is_bigger( object object ){
+  if ( !strcmp(object->this.symbol, ">" ) ){
+    return TRUE;
+  }
+  return FALSE;
+}
+
+int is_addition( object object ){
+  if ( !strcmp(object->this.symbol, "+" ) ){
+    return TRUE;
+  }
+  return FALSE;
+}
+
+int is_subtraction( object object ){
+  if ( !strcmp(object->this.symbol, "-" ) ){
+    return TRUE;
+  }
+  return FALSE;
+}
+
+int is_multiplication( object object ){
+  if ( !strcmp(object->this.symbol, "*" ) ){
+    return TRUE;
+  }
+  return FALSE;
+}
+
+int is_division( object object ){
+  if ( !strcmp(object->this.symbol, "/" ) ){
+    return TRUE;
+  }
+  return FALSE;
+}
+
 int is_forme(object symbol){
     if(is_quote(symbol) || is_define(symbol) || is_set(symbol)
-    || is_if(symbol) || is_and(symbol) || is_or(symbol)){
+       || is_if(symbol) || is_and(symbol) || is_or(symbol)
+       || is_equal(symbol) || is_smaller(symbol) || is_bigger(symbol)
+       || is_addition(symbol) || is_subtraction(symbol) || is_multiplication(symbol)
+       || is_division(symbol)){
+
       return TRUE;
     }
     return FALSE;

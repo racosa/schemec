@@ -56,14 +56,14 @@ int main ( int argc, char *argv[] ) {
     FILE *   fp = NULL; /* le flux dans lequel les commande seront lues : stdin (mode shell) ou un fichier */
 
     /* exemples d'utilisation des macros du fichier notify.h */
-    /* WARNING_MSG : sera toujours affiche */
-    WARNING_MSG("Un message WARNING_MSG !");
+    /* WARNING_MSG : sera toujours affiche
+    WARNING_MSG("Un message WARNING_MSG !");*/
 
     /* macro INFO_MSG : uniquement si compil avec -DVERBOSE. Cf Makefile*/
-    INFO_MSG("Un message INFO_MSG : Debut du programme %s", argv[0]);
-
-    /* macro DEBUG_MSG : uniquement si compil avec -DDEBUG (ie : compil avec make debug). Cf Makefile */
-    DEBUG_MSG("Un message DEBUG_MSG !");
+    INFO_MSG("# Scheme interpreter - version 0.2");
+    INFO_MSG("-----------------------------------");
+    /* macro DEBUG_MSG : uniquement si compil avec -DDEBUG (ie : compil avec make debug). Cf Makefile
+    DEBUG_MSG("Un message DEBUG_MSG !");*/
 
     /* La ligne suivante provoquerait l'affichage du message
        puis la sortie du programme avec un code erreur non nul (EXIT_FAILURE) */
