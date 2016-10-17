@@ -27,7 +27,7 @@ object sfs_eval( object input ) {
           /* Implementing quote forme evaluation. */
           if( is_quote(car(input)) ){
             if( cdr(cdr(input)) == nil ){
-              DEBUG_MSG("# quote forme detected");
+              DEBUG_MSG("# \" quote \" forme detected");
               return car(cdr(input));
             }
             else{
@@ -39,7 +39,7 @@ object sfs_eval( object input ) {
           /* Implementing define forme evaluation. */
           /* TODO Implement variable atribuition to another variable*/
           else if(is_define(car(input))){
-            DEBUG_MSG("# define forme detected");
+            DEBUG_MSG("# \" define \" forme detected");
             object symbol = make_pair();
             symbol->this.pair.car = NULL;
             symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
@@ -57,7 +57,7 @@ object sfs_eval( object input ) {
 
           /* Implementing set! forme evaluation. */
           else if(is_set(car(input))){
-            DEBUG_MSG("# set! forme detected");
+            DEBUG_MSG("# \" set! \" forme detected");
             object symbol = make_pair();
             symbol->this.pair.car = NULL;
             symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
@@ -73,12 +73,11 @@ object sfs_eval( object input ) {
               return nil;
             }
           }
+          
           /* Implementing if forme evaluation. */
           else if(is_if(car(input))){
             if(cdr(cdr(cdr(cdr(input)))) == nil){
-
-
-              DEBUG_MSG("# if forme detected");
+              DEBUG_MSG("# \" if \" forme detected");
               if(sfs_eval(car(cdr(input))) != false){
                 DEBUG_MSG("# (predicate) is (true), evaluating (consequence)");
                 input = car(cdr(cdr(input)));
@@ -91,6 +90,33 @@ object sfs_eval( object input ) {
               goto eval;
             }
           }
+
+          /* Implementing and forme evaluation. */
+          else if(is_and(car(input))){
+            DEBUG_MSG("# \" and \" forme detected");
+            input = cdr(input);
+            while(cdr(input) != nil){
+              if(sfs_eval(car(input)) == false){
+                return false;
+              }
+              input = cdr(input);
+            }
+            return sfs_eval(car(input));
+          }
+
+          /* Implementing or forme evaluation. */
+          else if(is_or(car(input))){
+            DEBUG_MSG("# \" or \" forme detected");
+            input = cdr(input);
+            while(cdr(input) != nil){
+              if(sfs_eval(car(input)) != false){
+                return sfs_eval(car(input));
+              }
+              input = cdr(input);
+            }
+            return sfs_eval(car(input));
+          }
+
             /* Implementing symbol evaluation. */
             else if(car(input)->type == SFS_SYMBOL){
               object symbol;
@@ -148,8 +174,23 @@ int is_if( object object ){
   return FALSE;
 }
 
+int is_and( object object ){
+  if ( !strcmp(object->this.symbol, "and" ) ){
+    return TRUE;
+  }
+  return FALSE;
+}
+
+int is_or( object object ){
+  if ( !strcmp(object->this.symbol, "or" ) ){
+    return TRUE;
+  }
+  return FALSE;
+}
+
 int is_forme(object symbol){
-    if(is_quote(symbol) || is_define(symbol) || is_set(symbol) || is_if(symbol)){
+    if(is_quote(symbol) || is_define(symbol) || is_set(symbol)
+    || is_if(symbol) || is_and(symbol) || is_or(symbol)){
       return TRUE;
     }
     return FALSE;

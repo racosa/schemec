@@ -24,6 +24,8 @@ int is_quote(object object);
 int is_define( object object );
 int is_set( object object );
 int is_if( object object );
+int is_and( object object );
+int is_or( object object );
 
 #ifdef __cplusplus
 }
