@@ -297,21 +297,18 @@ object sfs_read( char *input, uint *here ) {
     while(isspace(input[*here])){
       (*here)++;
     }
-/*
     if( input[ *here ] == '\'' && !isspace(input[*here + 1])){
-      int index = 0;
-      char quote_input[STRLEN];
-      init_string(quote_input);
-      strcpy(quote_input, "quote ");
-      strcpy(&quote_input[7], &input[*here+1]);
-      while(quote_input[index] != '\0' && quote_input[index] != ')'){
-        index++;
-      }
-      quote_input[index] = ')';
-      return sfs_read(quote_input, here );
+      fix_quote_input(input, here, 0);
+      return sfs_read(input, here );
     }
-*/
+
     if ( input[*here] == '(' ) {
+        if(input[(*here)+1] == '\''&& !isspace(input[*here + 2]) ){
+            fix_quote_input(input, here, 1);
+            (*here)++;
+            return sfs_read_pair( input, here );
+          }
+
         if ( input[(*here)+1] == ')' ) {
             *here += 2;
             DEBUG_MSG("Atome identified of type: SFS_NIL -> Value: () " );
@@ -355,9 +352,28 @@ object sfs_read_atom( char *input, uint *here ) {
             here_init++;
           }
           else if(input[ (*here) ] == '\''){
-            atom = make_symbol("quote");
-            (*here)++;
-            atom_found = TRUE;
+            DEBUG_MSG("--------- quote found..");
+            int index = 0;
+            char input_before_quote[STRLEN];
+            init_string(input_before_quote);
+            char input_after_quote[STRLEN];
+            init_string(input_after_quote);
+
+            strcpy(input_before_quote, "(quote ");
+            strcpy(&input_before_quote[7], &input[*here+2]);
+            while(input_before_quote[index] != '\0' && input_before_quote[index] != ')'){
+              index++;
+            }
+            DEBUG_MSG("input_before_quote = %s", input_before_quote);
+            strncpy(input_after_quote, input_before_quote, index);
+            DEBUG_MSG("input_after_quote = %s", input_after_quote);
+            int len = strlen(input_after_quote);
+            strcpy(input_after_quote + len, ")");
+            DEBUG_MSG("input_after_quote = %s", input_after_quote);
+            strcpy(input_after_quote+len+1, input_before_quote+index);
+            DEBUG_MSG("input_after_quote = %s", input_after_quote);
+            return sfs_read(input_after_quote, here );
+
           }
           else if( input[ (*here) ] == '+' || input[ (*here) ] == '-' ){
             if( input[ (*here) +1 ] >= '0' && input[ (*here) + 1 ] <= '9'){
@@ -543,6 +559,7 @@ object sfs_read_pair( char *stream, uint *i ) {
           DEBUG_MSG("# Insertion completed");
           while (isspace(stream[*i]) || stream[*i] == '\t'){
               (*i)++;
+              DEBUG_MSG("stream[*i] = %c", stream[*i]);
           }
         }
         else{
@@ -551,6 +568,7 @@ object sfs_read_pair( char *stream, uint *i ) {
         }
       }
     }
+    DEBUG_MSG("sfs_read_pair returning 0 ... ");
     return 0;
 }
 
@@ -569,4 +587,26 @@ void insert_object_in_tree(object car, object list){
         list = list->this.pair.cdr;
       }
     }
+}
+
+void fix_quote_input(char *input, uint *here, uint atome_or_pair){
+    int index = 0;
+    string input_before_quote;
+    init_string(input_before_quote);
+    string input_after_quote;
+    init_string(input_after_quote);
+
+    strncpy(input_before_quote, input, (*here) + atome_or_pair);
+    int len = strlen(input_before_quote);
+    strcpy(input_before_quote + len, "(quote ");
+    len += strlen("(quote ");
+    strcpy(input_before_quote + len, input + (*here) + 1 + atome_or_pair);
+    while(input_before_quote[index] != '\0' && input_before_quote[index] != ')'){
+      index++;
+    }
+    strncpy(input_after_quote, input_before_quote, index);
+    len = strlen(input_after_quote);
+    strcpy(input_after_quote + len, ")");
+    strcpy(input_after_quote + len + 1, input_before_quote + index);
+    strcpy(input, input_after_quote);
 }
