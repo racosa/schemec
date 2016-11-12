@@ -2,7 +2,7 @@
  * @file environment.c
  * @author Rafael Costa Sales
  * @date Sat Oct 16 00:56:33 2016
- * @brief Environments stuff for the schemeC interpreter.
+ * @brief Environments functions for the schemeC interpreter.
  *
  * Functions to manipulate environments in the schemeC interpreter.
  */
@@ -10,6 +10,7 @@
 #include "object.h"
 #include "environment.h"
 #include "print.h"
+#include "primitive.h"
 
 object make_top_level_environment( void ){
   environment = make_pair();
@@ -49,7 +50,7 @@ object search_symbol_in_environment(string symbol){
   return NULL;
 }
 
-void initialize_formes(){
+void initialize_formes(void){
   DEBUG_MSG("; Initializing formes in the top level environment..");
   int i;
   object symbol_name = make_object(SFS_SYMBOL);
@@ -70,4 +71,11 @@ void initialize_formes(){
     insert_symbol_in_environment(symbol_pair);
   }
   DEBUG_MSG("; ----------------------------------------- Completed");
+}
+
+void initialize_primitives(void){
+  initialize_primitive("+", primitive_add);
+
+  initialize_primitive("cons", primitive_cons);
+
 }

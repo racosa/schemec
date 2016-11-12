@@ -163,70 +163,21 @@ object sfs_eval( object input ) {
               return sfs_eval(car(input));
             }
 
-            /* Implementing = operand evaluation. */
-            /* TODO Implement multiple arguments evaluation */
-            else if(is_equal(caar(input))){
-              DEBUG_MSG("# \" = \" signal detected");
-              input = cdr( input );
-              if ( cdr(cdr( input )) == nil ){
-                if ( (sfs_eval(car( input )))->this.number.this.integer ==
-                (sfs_eval(car(cdr( input ))))->this.number.this.integer){
-                  return true;
-                }
-                else{
-                  return false;
-                }
+            else if(is_primitive(car(input))){
+              DEBUG_MSG("; primitive \" %s \" detected", caar(input)->this.symbol);
+              primitive primitive_function = cdr(car(input))->this.primitive.function;
+              object arguments = nil;
+              while(cdr(input) != nil){
+                DEBUG_MSG("cdr(input) != nil");
+
+                arguments = cons(sfs_eval(car(cdr(input))), arguments);
+                input = cdr(input);
               }
-              else{
-                WARNING_MSG("Invalid math statement");
-                return NULL;
-              }
+              return primitive_function(arguments);
             }
 
-            /* Implementing < signal evaluation. */
-            /* TODO Implement multiple arguments evaluation */
-            else if(is_smaller(caar(input))){
-              DEBUG_MSG("# \" < \" signal detected");
-              input = cdr( input );
-              if ( cdr(cdr( input )) == nil ){
-                if ( (sfs_eval(car( input )))->this.number.this.integer <
-                (sfs_eval(car(cdr( input ))))->this.number.this.integer){
-                  return true;
-                }
-                else{
-                  return false;
-                }
-              }
-              else{
-                WARNING_MSG("Invalid math statement");
-                return NULL;
-              }
-            }
-
-            /* Implementing > signal evaluation. */
-            /* TODO Implement multiple arguments evaluation */
-            else if(is_bigger(caar(input))){
-              DEBUG_MSG("# \" > \" signal detected");
-              input = cdr( input );
-              if ( cdr(cdr( input )) == nil ){
-                if ( (sfs_eval(car( input )))->this.number.this.integer >
-                (sfs_eval(car(cdr( input ))))->this.number.this.integer){
-                  return true;
-                }
-                else{
-                  return false;
-                }
-              }
-              else{
-                WARNING_MSG("Invalid math statement");
-                return 0;
-              }
-            }
-
-            /* TODO Implement addition, subtraction, multiplication and division evaluation */
-
-              /* Implementing symbol evaluation. */
-              else if(car(input)->type == SFS_SYMBOL){
+            /* Implementing symbol evaluation. */
+            else if(car(input)->type == SFS_SYMBOL){
                 object symbol;
                 symbol = search_symbol_in_environment( car(input)->this.symbol );
                 if(cdr(car(symbol)) != nil  ){
@@ -251,6 +202,15 @@ object sfs_eval( object input ) {
     else{
       return NULL;
     }
+}
+
+int is_primitive( object object ){
+  if(object){
+    if(cdr(object)->type == SFS_PRIMITIVE){
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
 
 int is_quote( object object ){

@@ -94,6 +94,12 @@ object make_symbol ( string symbol ){
     return car(symbol_index);
 }
 
+object make_primitive (primitive function){
+  object primitive_function = make_object (SFS_PRIMITIVE);
+  primitive_function->this.primitive.function = function;
+  return primitive_function;
+}
+
 object make_pair ( void ){
 
     object t = make_object ( SFS_PAIR );
@@ -132,4 +138,11 @@ object caar ( object object ){
     }
   }
   return NULL;
+}
+
+object cons(object car, object cdr){
+  object pair = make_pair();
+  pair->this.pair.car = car;
+  pair->this.pair.cdr = cdr;
+  return pair;
 }

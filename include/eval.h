@@ -17,6 +17,7 @@ extern "C" {
 
 
 #include "object.h"
+#include "primitive.h"
 
 object sfs_eval( object );
 int is_forme(object symbol);
@@ -26,13 +27,7 @@ int is_set( object object );
 int is_if( object object );
 int is_and( object object );
 int is_or( object object );
-int is_equal( object object );
-int is_smaller( object object );
-int is_bigger( object object );
-int is_addition( object object );
-int is_subtraction( object object );
-int is_multiplication( object object );
-int is_division( object object );
+int is_primitive( object object );
 
 #ifdef __cplusplus
 }

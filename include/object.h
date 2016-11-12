@@ -36,9 +36,15 @@ typedef struct object_t {
 
         struct object_t *special; /* empty_list */
 
+        struct {
+          struct object_t * (*function)(struct object_t *);
+        } primitive;
+
     } this;
 
 } *object;
+
+typedef object (*primitive)(object);
 
 object make_object( uint type );
 object make_nil( void );
@@ -51,6 +57,8 @@ object make_pair ( void );
 object car ( object object );
 object cdr ( object object );
 object caar ( object object );
+object cons(object car, object cdr);
+object make_primitive (primitive function);
 
 #define SFS_NUMBER       0x00
 #define SFS_CHARACTER    0x01
@@ -59,7 +67,7 @@ object caar ( object object );
 #define SFS_NIL          0x04
 #define SFS_BOOLEAN      0x05
 #define SFS_SYMBOL       0x06
-
+#define SFS_PRIMITIVE    0x07
 
 extern object nil;
 extern object true;

@@ -77,7 +77,7 @@ void sfs_print_atom( object o ) {
         printf("()");
       break;
       default:
-        ERROR_MSG("EXCEPTION in print_atom() function");
+        WARNING_MSG("EXCEPTION in print_atom() function");
       break;
     }
     return;
@@ -107,6 +107,12 @@ void sfs_print( object o ) {
     if ( SFS_PAIR == o->type ) {
       if(car(o)->type == SFS_SYMBOL){
           sfs_print_atom(car(o));
+      }
+      else if(cdr(o)->type != SFS_PAIR && cdr(o) != nil){
+          sfs_print_atom(car(o));
+          printf(" . ");
+          sfs_print_atom(cdr(o));
+          printf(")");
       }
       else{
           sfs_print_pair( o );

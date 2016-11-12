@@ -22,6 +22,7 @@ object make_top_level_environment( void );
 object insert_symbol_in_environment( object symbol_pair );
 object search_symbol_in_environment( string symbol );
 void initialize_formes( void );
+void initialize_primitives( void );
 
 #ifdef __cplusplus
 }

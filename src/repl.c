@@ -42,6 +42,7 @@ void init_interpreter ( void ) {
     false = make_boolean();
 
     initialize_formes();
+    initialize_primitives();
 
 }
 
