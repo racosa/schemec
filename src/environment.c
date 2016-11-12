@@ -50,7 +50,7 @@ object search_symbol_in_environment(string symbol){
 }
 
 void initialize_formes(){
-  DEBUG_MSG("Initializing formes in the top level environment..");
+  DEBUG_MSG("; Initializing formes in the top level environment..");
   int i;
   object symbol_name = make_object(SFS_SYMBOL);
   object symbol_pair = make_pair();
@@ -69,5 +69,5 @@ void initialize_formes(){
     symbol_pair->this.pair.car = symbol_name;
     insert_symbol_in_environment(symbol_pair);
   }
-  DEBUG_MSG("----------------------------------------- Completed");
+  DEBUG_MSG("; ----------------------------------------- Completed");
 }

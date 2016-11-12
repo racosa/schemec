@@ -311,7 +311,7 @@ object sfs_read( char *input, uint *here ) {
 
         if ( input[(*here)+1] == ')' ) {
             *here += 2;
-            DEBUG_MSG("Atome identified of type: SFS_NIL -> Value: () " );
+            DEBUG_MSG("; Atome identified of type: SFS_NIL -> Value: () " );
             return nil;
         }
         else {
@@ -320,7 +320,7 @@ object sfs_read( char *input, uint *here ) {
               (*here)++;
               if ( input[(*here)] == ')' ) {
                 (*here)++;
-                DEBUG_MSG("Atome identified of type: SFS_NIL -> Value: () " );
+                DEBUG_MSG("; Atome identified of type: SFS_NIL -> Value: () " );
                 return nil;
               }
             }
@@ -382,20 +382,20 @@ object sfs_read_atom( char *input, uint *here ) {
             if ( errno == ERANGE ){
               if (number_input == LONG_MAX){
                 atom = make_number(1, NUM_PINFTY);
-                DEBUG_MSG("# Atome identified of type: SFS_NUMBER -> Value: +inf " );
+                DEBUG_MSG("; Atome identified of type: SFS_NUMBER -> Value: +inf " );
               }
               else if(number_input == LONG_MIN){
                 atom = make_number(-1, NUM_MINFTY);
-                DEBUG_MSG("# Atome identified of type: SFS_NUMBER -> Value: -inf " );
+                DEBUG_MSG("; Atome identified of type: SFS_NUMBER -> Value: -inf " );
               }
             }
             else if (errno != 0 && number_input == 0){
-              WARNING_MSG("# Error converting string to number.");
+              WARNING_MSG("; Error converting string to number.");
               return 0;
             }
             else{
               atom = make_number(number_input, NUM_INTEGER);
-              DEBUG_MSG("# Atome identified of type: SFS_NUMBER -> Value: %d ", atom->this.number.this.integer );
+              DEBUG_MSG("; Atome identified of type: SFS_NUMBER -> Value: %d ", atom->this.number.this.integer );
             }
             atom_found = TRUE;
           }
@@ -412,7 +412,7 @@ object sfs_read_atom( char *input, uint *here ) {
               init_string(atom_input);
               strncpy( atom_input, &input[here_init], atom_size );
               atom = make_string( atom_input );
-              DEBUG_MSG("# Atome identified of type: SFS_STRING -> Value: %s ", atom->this.string );
+              DEBUG_MSG("; Atome identified of type: SFS_STRING -> Value: %s ", atom->this.string );
               atom_found = TRUE;
             }
           }
@@ -422,12 +422,12 @@ object sfs_read_atom( char *input, uint *here ) {
           if(input[ (*here)+1 ] == '\0' || input [ (*here)+1 ] == ' ' || input [ (*here)+1 ] == ')'){
             if( input[ (*here) ] == 't' ){
               atom = true;
-              DEBUG_MSG("# Atome identified of type: SFS_BOOLEAN -> Value: true " );
+              DEBUG_MSG("; Atome identified of type: SFS_BOOLEAN -> Value: true " );
               atom_found = TRUE;
             }
             else if ( input[ (*here) ] == 'f' ){
               atom = false;
-              DEBUG_MSG("# Atome identified of type: SFS_BOOLEAN -> Value: false " );
+              DEBUG_MSG("; Atome identified of type: SFS_BOOLEAN -> Value: false " );
               atom_found = TRUE;
             }
             else if( input[ (*here) ] == '\\' ){       /*Catching closing parentesis char exception.*/
@@ -438,7 +438,7 @@ object sfs_read_atom( char *input, uint *here ) {
             state = STATE_CHAR;
           }
           else {
-            WARNING_MSG("# ERROR: invalid atom type");
+            WARNING_MSG("; ERROR: invalid atom type");
             return 0;
           }
           break;
@@ -448,7 +448,7 @@ object sfs_read_atom( char *input, uint *here ) {
               || input [ (*here) + 5 ] == SPACE || input [ (*here) + 5 ] == OPENING_PARENTHESIS
               || input [ (*here) + 5 ] == CLOSING_PARENTHESIS) ){
             atom = make_character( ' ' );
-            DEBUG_MSG("# Atome identified of type: SFS_CHARACTER -> Value: #\\space " );
+            DEBUG_MSG("; Atome identified of type: SFS_CHARACTER -> Value: #\\space " );
             atom_found = TRUE;
             (*here)+=4;
           }
@@ -456,7 +456,7 @@ object sfs_read_atom( char *input, uint *here ) {
                    || input [ (*here) + 7 ] == SPACE || input [ (*here) + 7 ] == OPENING_PARENTHESIS
                    || input [ (*here) + 7 ] == CLOSING_PARENTHESIS ) ){
             atom = make_character( '\n' );
-            DEBUG_MSG("# Atome identified of type: SFS_CHARACTER -> Value: #\\newline " );
+            DEBUG_MSG("; Atome identified of type: SFS_CHARACTER -> Value: #\\newline " );
             atom_found = TRUE;
             (*here)+=6;
           }
@@ -464,12 +464,12 @@ object sfs_read_atom( char *input, uint *here ) {
                    || input [ (*here) + 1 ] == SPACE || input [ (*here) + 1 ] == OPENING_PARENTHESIS
                    || input [ (*here) + 1 ] == CLOSING_PARENTHESIS ) ){
             atom = make_character( input[ (*here) ] );
-            DEBUG_MSG("# Atome identified of type: SFS_CHARACTER -> Value: %c ", atom->this.character );
+            DEBUG_MSG("; Atome identified of type: SFS_CHARACTER -> Value: %c ", atom->this.character );
             atom_found = TRUE;
           }
           else if ( input[ (*here) ] != END_OF_STRING || input [ (*here) ] == SPACE
                     || input [ (*here) ] == OPENING_PARENTHESIS || input [ (*here) ] == CLOSING_PARENTHESIS ){
-            WARNING_MSG("# ERROR: invalid atom type");
+            WARNING_MSG("; ERROR: invalid atom type");
             return 0;
           }
           break;
@@ -482,19 +482,19 @@ object sfs_read_atom( char *input, uint *here ) {
             init_string(atom_input);
             strncpy(atom_input, &input[here_init], atom_size);
             atom = make_symbol( atom_input );
-            DEBUG_MSG("# Atome identified of type: SFS_SYMBOL -> Value: %s ", atom->this.symbol );
+            DEBUG_MSG("; Atome identified of type: SFS_SYMBOL -> Value: %s ", atom->this.pair.car->this.symbol );
             atom_found = TRUE;
           }
           break;
 
         case STATE_EMPTY_LIST:
           atom = nil;
-          DEBUG_MSG("# Atome identified of type: SFS_NIL -> Value: () " );
+          DEBUG_MSG("; Atome identified of type: SFS_NIL -> Value: () " );
           atom_found = TRUE;
         break;
 
         default:
-          WARNING_MSG("# ERROR: invalid atom type");
+          WARNING_MSG("; ERROR: invalid atom type");
           return 0;
           break;
       }
@@ -523,28 +523,23 @@ object sfs_read_pair( char *stream, uint *i ) {
           (*i)++;
       }
       if (stream[*i] == ')') {
-        DEBUG_MSG("# Returning pair");
+        DEBUG_MSG("; Returning pair");
         (*i)++;
         return pair;
       }
       else {
         next_object = sfs_read( stream, i );
         if (next_object){
-          DEBUG_MSG("# Inserting object in tree..");
+          DEBUG_MSG("; Inserting object in tree..");
           insert_object_in_tree( next_object, pair );
-          DEBUG_MSG("# Insertion completed");
+          DEBUG_MSG("; Insertion completed");
           while (isspace(stream[*i]) || stream[*i] == '\t'){
               (*i)++;
-              DEBUG_MSG("stream[*i] = %c", stream[*i]);
           }
-        }
-        else{
-          DEBUG_MSG("# EXCEPTION in read_pair() function");
-          return 0;
         }
       }
     }
-    DEBUG_MSG("sfs_read_pair returning 0 ... ");
+    WARNING_MSG("; ERROR: Exception in read_pair() function");
     return 0;
 }
 
@@ -577,7 +572,8 @@ void fix_quote_input(char *input, uint *here, uint atome_or_pair){
     strcpy(input_before_quote + len, "(quote ");
     len += strlen("(quote ");
     strcpy(input_before_quote + len, input + (*here) + 1 + atome_or_pair);
-    while(input_before_quote[index] != '\0' && input_before_quote[index] != ')'){
+    index = len;
+    while(!isspace(input_before_quote[index]) && input_before_quote[index] != ')' ){
       index++;
     }
     strncpy(input_after_quote, input_before_quote, index);

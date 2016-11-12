@@ -29,11 +29,11 @@ object sfs_eval( object input ) {
             /* Implementing quote forme evaluation. */
             if( is_quote(caar(input)) ){
               if( cdr(cdr(input)) == nil ){
-                DEBUG_MSG("# \" quote \" forme detected");
+                DEBUG_MSG("; \" quote \" forme detected");
                 return car(cdr(input));
               }
               else{
-                WARNING_MSG("Primitive forme with missing or extra arguments");
+                WARNING_MSG("; ERROR: quote: missing or extra arguments");
                 return NULL;
               }
             }
@@ -42,14 +42,14 @@ object sfs_eval( object input ) {
             else if(is_define(caar(input))){
               if(cdr(cdr(cdr(input))) == nil){
 
-                DEBUG_MSG("# \" define \" forme detected");
+                DEBUG_MSG("; \" define \" forme detected");
                 object symbol = make_pair();
                 object symbol_value = sfs_malloc(sizeof(*symbol_value));
                 symbol->this.pair.car = NULL;
 
                 symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
                 if(cdr(car(symbol)) != nil ){
-                  DEBUG_MSG("# Variable already exists in top level environment, modyfing.. ");
+                  DEBUG_MSG("; Variable already exists in top level environment: modyfing.. ");
                   symbol_value = sfs_eval(car(cdr(cdr(input))));
                   if(symbol_value) {
                     symbol->this.pair.car->this.pair.cdr = symbol_value;
@@ -74,7 +74,7 @@ object sfs_eval( object input ) {
 
               }
               else {
-                WARNING_MSG("Primitive forme with missing or extra arguments");
+                WARNING_MSG("; ERROR: define: missing or extra arguments");
                 return NULL;
               }
             }
@@ -82,7 +82,7 @@ object sfs_eval( object input ) {
             /* Implementing set! forme evaluation. */
             else if(is_set(caar(input))){
               if(cdr(cdr(cdr(input))) == nil){
-                DEBUG_MSG("# \" set! \" forme detected");
+                DEBUG_MSG("; \" set! \" forme detected");
                 object symbol = make_pair();
                 symbol->this.pair.car = NULL;
                 symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
@@ -94,12 +94,12 @@ object sfs_eval( object input ) {
                   return old_symbol_value;
                 }
                 else{
-                  WARNING_MSG("Unbound variable");
+                  WARNING_MSG("; ERROR: unbound variable");
                   return NULL;
                 }
               }
               else {
-                WARNING_MSG("Primitive forme with missing or extra arguments");
+                WARNING_MSG("; ERROR: set!: missing or extra arguments");
                 return NULL;
               }
 
@@ -107,28 +107,30 @@ object sfs_eval( object input ) {
 
             /* Implementing if forme evaluation. */
             else if(is_if(caar(input))){
+
               if(cdr(cdr(cdr(cdr(input)))) == nil){
-                DEBUG_MSG("# \" if \" forme detected");
+
+                DEBUG_MSG("; \" if \" forme detected");
                 if(sfs_eval(car(cdr(input))) != false){
-                  DEBUG_MSG("# (predicate) is (true), evaluating (consequence)");
+                  DEBUG_MSG("; (predicate) is (true), evaluating (consequence)");
                   input = car(cdr(cdr(input)));
                 }
                 else{
-                  DEBUG_MSG("# (predicate) is (false), evaluating (alternative)");
+                  DEBUG_MSG("; (predicate) is (false), evaluating (alternative)");
                   input = car(cdr(cdr(cdr(input))));
                 }
                 /*Goto begin of eval function*/
                 goto eval;
               }
               else {
-                WARNING_MSG("Primitive forme with missing or extra arguments");
+                WARNING_MSG("; ERROR: if: missing or extra arguments");
                 return NULL;
               }
             }
 
             /* Implementing and forme evaluation. */
             else if(is_and(caar(input))){
-              DEBUG_MSG("# \" and \" forme detected");
+              DEBUG_MSG("; \" and \" forme detected");
               input = cdr(input);
               while(cdr(input) != nil){
                 if(sfs_eval(car(input)) == false){
@@ -147,7 +149,7 @@ object sfs_eval( object input ) {
 
             /* Implementing or forme evaluation. */
             else if(is_or(caar(input))){
-              DEBUG_MSG("# \" or \" forme detected");
+              DEBUG_MSG("; \" or \" forme detected");
               input = cdr(input);
               if(car(input) == NULL){ /* or without arguments */
                 return false;
@@ -228,35 +230,28 @@ object sfs_eval( object input ) {
                 object symbol;
                 symbol = search_symbol_in_environment( car(input)->this.symbol );
                 if(cdr(car(symbol)) != nil  ){
-                  DEBUG_MSG("# Variable found in top level environment");
+                  DEBUG_MSG("; Variable found in top level environment");
                   return cdr(car(symbol));
                 }
-                WARNING_MSG("# Unbound variable: %s", car(car(symbol))->this.symbol );
+                WARNING_MSG("; ERROR: unbound variable: %s", car(car(symbol))->this.symbol );
                 return NULL;
               }
 
               else{
-                WARNING_MSG("Primitive forme with missing or extra arguments");
+                WARNING_MSG("; ERROR: wrong type to apply");
                 return NULL;
               }
-
             }
             else{
-              WARNING_MSG("# Wrong type to apply");
+              WARNING_MSG("; ERROR: wrong type to apply");
               return NULL;
             }
         }
-        WARNING_MSG("Primitive forme with missing or extra arguments");
-        return NULL;
-
     }
     else{
       return NULL;
     }
-
-    }
-
-
+}
 
 int is_quote( object object ){
   if(object){

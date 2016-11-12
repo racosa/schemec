@@ -131,6 +131,5 @@ object caar ( object object ){
       }
     }
   }
-  DEBUG_MSG("caar returning NULL...");
   return NULL;
 }
