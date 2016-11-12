@@ -351,30 +351,6 @@ object sfs_read_atom( char *input, uint *here ) {
             state = STATE_INIT;
             here_init++;
           }
-          else if(input[ (*here) ] == '\''){
-            DEBUG_MSG("--------- quote found..");
-            int index = 0;
-            char input_before_quote[STRLEN];
-            init_string(input_before_quote);
-            char input_after_quote[STRLEN];
-            init_string(input_after_quote);
-
-            strcpy(input_before_quote, "(quote ");
-            strcpy(&input_before_quote[7], &input[*here+2]);
-            while(input_before_quote[index] != '\0' && input_before_quote[index] != ')'){
-              index++;
-            }
-            DEBUG_MSG("input_before_quote = %s", input_before_quote);
-            strncpy(input_after_quote, input_before_quote, index);
-            DEBUG_MSG("input_after_quote = %s", input_after_quote);
-            int len = strlen(input_after_quote);
-            strcpy(input_after_quote + len, ")");
-            DEBUG_MSG("input_after_quote = %s", input_after_quote);
-            strcpy(input_after_quote+len+1, input_before_quote+index);
-            DEBUG_MSG("input_after_quote = %s", input_after_quote);
-            return sfs_read(input_after_quote, here );
-
-          }
           else if( input[ (*here) ] == '+' || input[ (*here) ] == '-' ){
             if( input[ (*here) +1 ] >= '0' && input[ (*here) + 1 ] <= '9'){
               state = STATE_NUMBER;
