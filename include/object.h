@@ -50,6 +50,7 @@ object make_symbol ( string symbol );
 object make_pair ( void );
 object car ( object object );
 object cdr ( object object );
+object caar ( object object );
 
 #define SFS_NUMBER       0x00
 #define SFS_CHARACTER    0x01

@@ -77,13 +77,6 @@ object make_symbol ( string symbol ){
 
     object symbol_name = make_object(SFS_SYMBOL);
     strcpy( symbol_name-> this.symbol, symbol );
-
-/*TODO Correct multiple equal formes*/
-    if(is_forme(symbol_name)){
-      DEBUG_MSG( "# Primitive forme \" %s \" detected", symbol_name->this.symbol );
-      return symbol_name;
-    }
-
     object symbol_index = make_pair();
     object symbol_pair = make_pair();
     symbol_pair->this.pair.car = make_object(SFS_SYMBOL);
@@ -92,12 +85,12 @@ object make_symbol ( string symbol ){
     symbol_index->this.pair.car = symbol_pair;
 
     if(car(environment) != NULL){
-      symbol_index = search_symbol_in_environment( symbol);
+      symbol_index = search_symbol_in_environment( symbol );
       if (symbol_index){
         return car(symbol_index);
       }
     }
-    symbol_index = insert_symbol_in_environment( symbol_pair);
+    symbol_index = insert_symbol_in_environment( symbol_pair );
     return car(symbol_index);
 }
 
@@ -125,5 +118,19 @@ object cdr ( object object ){
       return object->this.pair.cdr;
     }
   }
+  return NULL;
+}
+
+object caar ( object object ){
+  if(object){
+    if (object->type == SFS_PAIR){
+      if(car(object)){
+        if (car(object)->type == SFS_PAIR){
+          return car(object)->this.pair.car;
+        }
+      }
+    }
+  }
+  DEBUG_MSG("caar returning NULL...");
   return NULL;
 }

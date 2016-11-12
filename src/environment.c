@@ -48,3 +48,26 @@ object search_symbol_in_environment(string symbol){
   }
   return NULL;
 }
+
+void initialize_formes(){
+  DEBUG_MSG("Initializing formes in the top level environment..");
+  int i;
+  object symbol_name = make_object(SFS_SYMBOL);
+  object symbol_pair = make_pair();
+  symbol_pair->this.pair.car = make_object(SFS_SYMBOL);
+
+  const char *formes[] = {
+    "quote",
+    "define",
+    "set!",
+    "if",
+    "and",
+    "or"
+  };
+  for(i=0 ; i < 6 ; i++){
+    strcpy( symbol_name->this.symbol, formes[i] );
+    symbol_pair->this.pair.car = symbol_name;
+    insert_symbol_in_environment(symbol_pair);
+  }
+  DEBUG_MSG("----------------------------------------- Completed");
+}

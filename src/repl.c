@@ -35,12 +35,14 @@ object true;
 object false;
 
 void init_interpreter ( void ) {
-    
-    environment = make_top_level_environment();
 
+    environment = make_top_level_environment();
     nil   = make_nil();
     true  = make_boolean();
     false = make_boolean();
+
+    initialize_formes();
+
 }
 
 int main ( int argc, char *argv[] ) {
@@ -58,6 +60,7 @@ int main ( int argc, char *argv[] ) {
 
     /* macro INFO_MSG : uniquement si compil avec -DVERBOSE. Cf Makefile*/
     INFO_MSG("# Scheme interpreter - version 0.2");
+    INFO_MSG("# Press ctrl+c to Exit");
     INFO_MSG("-----------------------------------");
     /* macro DEBUG_MSG : uniquement si compil avec -DDEBUG (ie : compil avec make debug). Cf Makefile
     DEBUG_MSG("Un message DEBUG_MSG !");*/

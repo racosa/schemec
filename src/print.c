@@ -105,15 +105,8 @@ void sfs_print_pair( object o ) {
 
 void sfs_print( object o ) {
     if ( SFS_PAIR == o->type ) {
-
-      if(car(o)->type == SFS_SYMBOL){  /*Fixing print of symbols that belong to the environment*/
-        if(is_forme(car(o))){
-          printf("(");
-          sfs_print_pair(o);
-        }
-        else{
+      if(car(o)->type == SFS_SYMBOL){
           sfs_print_atom(car(o));
-        }
       }
       else{
           sfs_print_pair( o );

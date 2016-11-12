@@ -27,7 +27,7 @@ object sfs_eval( object input ) {
           if(input->type == SFS_PAIR){
 
             /* Implementing quote forme evaluation. */
-            if( is_quote(car(input)) ){
+            if( is_quote(caar(input)) ){
               if( cdr(cdr(input)) == nil ){
                 DEBUG_MSG("# \" quote \" forme detected");
                 return car(cdr(input));
@@ -39,7 +39,7 @@ object sfs_eval( object input ) {
             }
 
             /* Implementing define forme evaluation. */
-            else if(is_define(car(input))){
+            else if(is_define(caar(input))){
               if(cdr(cdr(cdr(input))) == nil){
 
                 DEBUG_MSG("# \" define \" forme detected");
@@ -80,7 +80,7 @@ object sfs_eval( object input ) {
             }
 
             /* Implementing set! forme evaluation. */
-            else if(is_set(car(input))){
+            else if(is_set(caar(input))){
               if(cdr(cdr(cdr(input))) == nil){
                 DEBUG_MSG("# \" set! \" forme detected");
                 object symbol = make_pair();
@@ -106,7 +106,7 @@ object sfs_eval( object input ) {
             }
 
             /* Implementing if forme evaluation. */
-            else if(is_if(car(input))){
+            else if(is_if(caar(input))){
               if(cdr(cdr(cdr(cdr(input)))) == nil){
                 DEBUG_MSG("# \" if \" forme detected");
                 if(sfs_eval(car(cdr(input))) != false){
@@ -127,7 +127,7 @@ object sfs_eval( object input ) {
             }
 
             /* Implementing and forme evaluation. */
-            else if(is_and(car(input))){
+            else if(is_and(caar(input))){
               DEBUG_MSG("# \" and \" forme detected");
               input = cdr(input);
               while(cdr(input) != nil){
@@ -146,7 +146,7 @@ object sfs_eval( object input ) {
 
 
             /* Implementing or forme evaluation. */
-            else if(is_or(car(input))){
+            else if(is_or(caar(input))){
               DEBUG_MSG("# \" or \" forme detected");
               input = cdr(input);
               if(car(input) == NULL){ /* or without arguments */
@@ -163,7 +163,7 @@ object sfs_eval( object input ) {
 
             /* Implementing = operand evaluation. */
             /* TODO Implement multiple arguments evaluation */
-            else if(is_equal(car(input))){
+            else if(is_equal(caar(input))){
               DEBUG_MSG("# \" = \" signal detected");
               input = cdr( input );
               if ( cdr(cdr( input )) == nil ){
@@ -183,7 +183,7 @@ object sfs_eval( object input ) {
 
             /* Implementing < signal evaluation. */
             /* TODO Implement multiple arguments evaluation */
-            else if(is_smaller(car(input))){
+            else if(is_smaller(caar(input))){
               DEBUG_MSG("# \" < \" signal detected");
               input = cdr( input );
               if ( cdr(cdr( input )) == nil ){
@@ -203,7 +203,7 @@ object sfs_eval( object input ) {
 
             /* Implementing > signal evaluation. */
             /* TODO Implement multiple arguments evaluation */
-            else if(is_bigger(car(input))){
+            else if(is_bigger(caar(input))){
               DEBUG_MSG("# \" > \" signal detected");
               input = cdr( input );
               if ( cdr(cdr( input )) == nil ){
@@ -259,71 +259,91 @@ object sfs_eval( object input ) {
 
 
 int is_quote( object object ){
-  if ( !strcmp( object->this.symbol, "quote" ) || !strcmp( object->this.symbol, "\'" ) ){
-    return TRUE;
+  if(object){
+    if ( !strcmp( object->this.symbol, "quote" ) || !strcmp( object->this.symbol, "\'" ) ){
+      return TRUE;
+    }
   }
   return FALSE;
 }
 
 int is_define( object object ){
-  if ( !strcmp(object->this.symbol, "define" ) ){
-    return TRUE;
+  if(object){
+    if ( !strcmp(object->this.symbol, "define" ) ){
+      return TRUE;
+    }
   }
   return FALSE;
 }
 
 int is_set( object object ){
-  if ( !strcmp(object->this.symbol, "set!" ) ){
-    return TRUE;
+  if(object){
+    if ( !strcmp(object->this.symbol, "set!" ) ){
+      return TRUE;
+    }
   }
   return FALSE;
 }
 
 int is_if( object object ){
-  if ( !strcmp(object->this.symbol, "if" ) ){
-    return TRUE;
+  if(object){
+    if ( !strcmp(object->this.symbol, "if" ) ){
+      return TRUE;
+    }
   }
   return FALSE;
 }
 
 int is_and( object object ){
-  if ( !strcmp(object->this.symbol, "and" ) ){
-    return TRUE;
+  if(object){
+    if ( !strcmp(object->this.symbol, "and" ) ){
+      return TRUE;
+    }
   }
   return FALSE;
 }
 
 int is_or( object object ){
-  if ( !strcmp(object->this.symbol, "or" ) ){
-    return TRUE;
+  if(object){
+    if ( !strcmp(object->this.symbol, "or" ) ){
+      return TRUE;
+    }
   }
   return FALSE;
 }
 
 int is_equal( object object ){
-  if ( !strcmp(object->this.symbol, "=" ) ){
-    return TRUE;
+  if(object){
+    if ( !strcmp(object->this.symbol, "=" ) ){
+      return TRUE;
+    }
   }
   return FALSE;
 }
 
 int is_smaller( object object ){
-  if ( !strcmp(object->this.symbol, "<" ) ){
-    return TRUE;
+  if(object){
+    if ( !strcmp(object->this.symbol, "<" ) ){
+      return TRUE;
+    }
   }
   return FALSE;
 }
 
 int is_bigger( object object ){
-  if ( !strcmp(object->this.symbol, ">" ) ){
-    return TRUE;
+  if(object){
+    if ( !strcmp(object->this.symbol, ">" ) ){
+      return TRUE;
+    }
   }
   return FALSE;
 }
 
 int is_addition( object object ){
-  if ( !strcmp(object->this.symbol, "+" ) ){
-    return TRUE;
+  if(object){
+    if ( !strcmp(object->this.symbol, "+" ) ){
+      return TRUE;
+    }
   }
   return FALSE;
 }

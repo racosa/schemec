@@ -297,12 +297,12 @@ object sfs_read( char *input, uint *here ) {
     while(isspace(input[*here])){
       (*here)++;
     }
-
-    if( input[ *here ] == '\'' && !isspace(input[*here + 1])){ /*Detecting quote forme.*/
+/*
+    if( input[ *here ] == '\'' && !isspace(input[*here + 1])){
       int index = 0;
       char quote_input[STRLEN];
       init_string(quote_input);
-      strcpy(quote_input, "(quote ");
+      strcpy(quote_input, "quote ");
       strcpy(&quote_input[7], &input[*here+1]);
       while(quote_input[index] != '\0' && quote_input[index] != ')'){
         index++;
@@ -310,7 +310,7 @@ object sfs_read( char *input, uint *here ) {
       quote_input[index] = ')';
       return sfs_read(quote_input, here );
     }
-
+*/
     if ( input[*here] == '(' ) {
         if ( input[(*here)+1] == ')' ) {
             *here += 2;
@@ -355,7 +355,8 @@ object sfs_read_atom( char *input, uint *here ) {
             here_init++;
           }
           else if(input[ (*here) ] == '\''){
-            atom = make_symbol("\'");
+            atom = make_symbol("quote");
+            (*here)++;
             atom_found = TRUE;
           }
           else if( input[ (*here) ] == '+' || input[ (*here) ] == '-' ){
