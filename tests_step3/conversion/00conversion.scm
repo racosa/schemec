@@ -11,7 +11,6 @@
 (char->integer #\7)
 (char->integer #\8)
 (char->integer #\9)
-;;;;
 (char->integer #\a)
 (char->integer #\b)
 (char->integer #\')
