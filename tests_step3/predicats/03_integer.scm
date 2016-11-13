@@ -13,7 +13,6 @@
 (integer? #\newline)
 (integer? "")
 (integer? "vrai")
-(integer? (1))
 (integer? (1 2))
 (define d -4)
 (integer? d)

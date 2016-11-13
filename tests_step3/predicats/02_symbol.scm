@@ -13,7 +13,6 @@
 (symbol? #\newline)
 (symbol? "")
 (symbol? "vrai")
-(symbol? (1))
 (symbol? (1 2))
 (symbol? 'j)
 (symbol? '5)
