@@ -1,0 +1,21 @@
+; TEST_RETURN_CODE=PASS
+; TEST_COMMENT= Test pair? predicat
+
+(pair? ())
+(pair? #t)
+(pair? #f)
+(pair? 5)
+(pair? -17)
+(pair? +28)
+(pair? #\o)
+(pair? #\8)
+(pair? #\space)
+(pair? #\newline)
+(pair? "")
+(pair? "vrai")
+(pair? (1))
+(pair? (1 2))
+(define r (3 4))
+(pair? r)
+(set! r #\a)
+(pair? r)
