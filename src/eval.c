@@ -204,7 +204,7 @@ object sfs_eval( object input ) {
 }
 
 int is_primitive( object object ){
-  if(object){
+  if(cdr(object)){
     if(cdr(object)->type == SFS_PRIMITIVE){
       return TRUE;
     }

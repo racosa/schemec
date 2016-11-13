@@ -27,6 +27,13 @@ object is_null_primitive(object arguments){
   return NULL;
 }
 
+object is_boolean_primitive(object arguments);
+object is_symbol_primitive(object arguments);
+object is_integer_primitive(object arguments);
+object is_char_primitive(object arguments);
+object is_string_primitive(object arguments);
+object is_pair_primitive(object arguments);
+
 /* Type convertion primitives */
 object char_to_integer_primitive(object arguments){
   if(cdr(arguments) == nil){
@@ -43,13 +50,19 @@ object char_to_integer_primitive(object arguments){
   return NULL;
 }
 
+object integer_to_char_primitive(object arguments);
+object number_to_string_primitive(object arguments);
+object string_to_number_primitive(object arguments);
+object symbol_to_string_primitive(object arguments);
+object string_to_symbol_primitive(object arguments);
+
 /* Integer arithmetic primitives */
-object integer_add_primitive(object arguments){
-  object sum = make_number(0, NUM_INTEGER);
+object integer_addition_primitive(object arguments){
+  object result = make_number(0, NUM_INTEGER);
   while (arguments != nil) {
     object operand = car(arguments);
     if (operand->type == SFS_NUMBER) {
-      sum->this.number.this.integer += operand->this.number.this.integer;
+      result->this.number.this.integer += operand->this.number.this.integer;
       arguments = cdr(arguments);
     }
     else{
@@ -57,8 +70,16 @@ object integer_add_primitive(object arguments){
       return NULL;
     }
   }
-  return sum;
+  return result;
 }
+
+object integer_subtraction_primitive(object arguments);
+object integer_multiplication_primitive(object arguments);
+object integer_quotient_primitive(object arguments);
+object integer_remainder_primitive(object arguments);
+object integer_equal_primitive(object arguments);
+object integer_less_primitive(object arguments);
+object integer_greater_primitive(object arguments);
 
 /* List manipulation primitives */
 object cons_primitive(object arguments){
@@ -72,5 +93,25 @@ object cons_primitive(object arguments){
   return NULL;
 }
 
-/* Polymorphic equality
-object polymorphic_equality_primitive(object arguments){} */
+object car_primitive(object arguments){
+  if(caar(arguments)){
+    return caar(arguments);
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure car ");
+  return NULL;
+}
+
+object cdr_primitive(object arguments){
+  if(caar(arguments)){
+    return cdr(car(arguments));
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure cdr ");
+  return NULL;
+}
+
+object set_car_primitive(object arguments);
+object set_cdr_primitive(object arguments);
+object list_primitive(object arguments);
+
+/* Polymorphic equality */
+object polymorphic_equality_primitive(object arguments);

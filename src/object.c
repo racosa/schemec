@@ -95,17 +95,16 @@ object make_symbol ( string symbol ){
 }
 
 object make_primitive (primitive function){
+
   object primitive_function = make_object (SFS_PRIMITIVE);
   primitive_function->this.primitive.function = function;
   return primitive_function;
 }
 
 object make_pair ( void ){
-
+  
     object t = make_object ( SFS_PAIR );
-/*    t->this.pair.car = NULL;
-*/    t->this.pair.cdr = nil;
-
+    t->this.pair.cdr = nil;
     return t;
 }
 

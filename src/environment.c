@@ -76,11 +76,39 @@ void initialize_formes(void){
 void initialize_primitives(void){
 
   initialize_primitive("null?", is_null_primitive);
-
+  /*
+  initialize_primitive("boolean?", is_boolean_primitive);
+  initialize_primitive("symbol?", is_symbol_primitive);
+  initialize_primitive("integer?", is_integer_primitive);
+  initialize_primitive("char?", is_char_primitive);
+  initialize_primitive("string?", is_string_primitive);
+  initialize_primitive("pair?", is_pair_primitive);
+*/
   initialize_primitive("char->integer", char_to_integer_primitive);
-
-  initialize_primitive("+", integer_add_primitive);
-  
+/*
+  initialize_primitive("integer->char", integer_to_char_primitive);
+  initialize_primitive("number->string", number_to_string_primitive);
+  initialize_primitive("string->number", string_to_number_primitive);
+  initialize_primitive("symbol->string", symbol_to_string_primitive);
+  initialize_primitive("string->symbol", string_to_symbol_primitive);
+*/
+  initialize_primitive("+", integer_addition_primitive);
+/*
+  initialize_primitive("-", integer_subtraction_primitive);
+  initialize_primitive("*", integer_multiplication_primitive);
+  initialize_primitive("quotient", integer_quotient_primitive);
+  initialize_primitive("remainder", integer_remainder_primitive);
+  initialize_primitive("=", integer_equal_primitive);
+  initialize_primitive("<", integer_less_primitive);
+  initialize_primitive(">", integer_greater_primitive);
+*/
   initialize_primitive("cons", cons_primitive);
+  initialize_primitive("car", car_primitive);
+  initialize_primitive("cdr", cdr_primitive);
+/*initialize_primitive("set-car!", set_car_primitive);
+  initialize_primitive("set-cdr!", set_cdr_primitive);
+  initialize_primitive("list", list_primitive);
 
+  initialize_primitive("eq?", polymorphic_equality_primitive);
+*/
 }
