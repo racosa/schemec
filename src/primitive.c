@@ -44,6 +44,11 @@ object is_symbol_primitive(object arguments){
     if(car(arguments)->type == SFS_SYMBOL){
       return true;
     }
+    else if(car(arguments)->type == SFS_PAIR){
+      if(caar(arguments)->type == SFS_SYMBOL){
+        return true;
+      }
+    }
     return false;
   }
   WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure symbol? ");

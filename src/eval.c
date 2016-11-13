@@ -194,7 +194,11 @@ object sfs_eval( object input ) {
               }
 
             else{
+              /*
                 return input;
+                */
+                WARNING_MSG("; ERROR: wrong type to apply");
+                return NULL;
               }
             }
             else{

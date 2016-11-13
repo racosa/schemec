@@ -13,6 +13,5 @@
 (null? #\newline)
 (null? "")
 (null? "bonjour")
-(null? (1 2))
 (define x ())
 (null? x)

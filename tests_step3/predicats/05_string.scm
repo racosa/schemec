@@ -13,7 +13,6 @@
 (string? #\newline)
 (string? "")
 (string? "vrai")
-(string? (1 2))
 (define r 2)
 (string? r)
 (set! r "bonjour")

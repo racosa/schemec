@@ -299,12 +299,14 @@ object sfs_read( char *input, uint *here ) {
     }
     if( input[ *here ] == '\'' && !isspace(input[*here + 1])){
       fix_quote_input(input, here, 0);
+      DEBUG_MSG("input = %s", input);
       return sfs_read(input, here );
     }
 
     if ( input[*here] == '(' ) {
         if(input[(*here)+1] == '\''&& !isspace(input[*here + 2]) ){
             fix_quote_input(input, here, 1);
+            DEBUG_MSG("input = %s", input);
             (*here)++;
             return sfs_read_pair( input, here );
           }
@@ -573,8 +575,23 @@ void fix_quote_input(char *input, uint *here, uint atome_or_pair){
     len += strlen("(quote ");
     strcpy(input_before_quote + len, input + (*here) + 1 + atome_or_pair);
     index = len;
-    while(!isspace(input_before_quote[index]) && input_before_quote[index] != ')' ){
+    if(input[*here + 1] == OPENING_PARENTHESIS){
+      int parentheses = 1;
       index++;
+      while(parentheses > 0){
+        if(input_before_quote[index] == OPENING_PARENTHESIS){
+          parentheses++;
+        }
+        if(input_before_quote[index] == CLOSING_PARENTHESIS){
+          parentheses--;
+        }
+        index++;
+      }
+    }
+    else{
+      while(!isspace(input_before_quote[index]) && input_before_quote[index] != CLOSING_PARENTHESIS ){
+        index++;
+      }
     }
     strncpy(input_after_quote, input_before_quote, index);
     len = strlen(input_after_quote);

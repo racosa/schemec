@@ -13,6 +13,5 @@
 (char? #\newline)
 (char? "")
 (char? "vrai")
-(char? (1 2))
 (define e #\a)
-(integer? e)
+(char? e)
