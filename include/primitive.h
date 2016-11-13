@@ -18,8 +18,10 @@ extern "C" {
 #include "environment.h"
 
 void initialize_primitive (string symbol, primitive function);
-object primitive_cons(object arguments);
-object primitive_add(object arguments);
+object cons_primitive(object arguments);
+object integer_add_primitive(object arguments);
+object is_null_primitive(object arguments);
+object char_to_integer_primitive(object arguments);
 
 #ifdef __cplusplus
 }

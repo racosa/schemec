@@ -163,13 +163,12 @@ object sfs_eval( object input ) {
               return sfs_eval(car(input));
             }
 
+            /* Implementing primitive evaluation. */
             else if(is_primitive(car(input))){
               DEBUG_MSG("; primitive \" %s \" detected", caar(input)->this.symbol);
               primitive primitive_function = cdr(car(input))->this.primitive.function;
               object arguments = nil;
               while(cdr(input) != nil){
-                DEBUG_MSG("cdr(input) != nil");
-
                 arguments = cons(sfs_eval(car(cdr(input))), arguments);
                 input = cdr(input);
               }
@@ -267,70 +266,9 @@ int is_or( object object ){
   return FALSE;
 }
 
-int is_equal( object object ){
-  if(object){
-    if ( !strcmp(object->this.symbol, "=" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_smaller( object object ){
-  if(object){
-    if ( !strcmp(object->this.symbol, "<" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_bigger( object object ){
-  if(object){
-    if ( !strcmp(object->this.symbol, ">" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_addition( object object ){
-  if(object){
-    if ( !strcmp(object->this.symbol, "+" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_subtraction( object object ){
-  if ( !strcmp(object->this.symbol, "-" ) ){
-    return TRUE;
-  }
-  return FALSE;
-}
-
-int is_multiplication( object object ){
-  if ( !strcmp(object->this.symbol, "*" ) ){
-    return TRUE;
-  }
-  return FALSE;
-}
-
-int is_division( object object ){
-  if ( !strcmp(object->this.symbol, "/" ) ){
-    return TRUE;
-  }
-  return FALSE;
-}
-
 int is_forme(object symbol){
     if(is_quote(symbol) || is_define(symbol) || is_set(symbol)
-       || is_if(symbol) || is_and(symbol) || is_or(symbol)
-       || is_equal(symbol) || is_smaller(symbol) || is_bigger(symbol)
-       || is_addition(symbol) || is_subtraction(symbol) || is_multiplication(symbol)
-       || is_division(symbol)){
-
+       || is_if(symbol) || is_and(symbol) || is_or(symbol)){
       return TRUE;
     }
     return FALSE;

@@ -108,7 +108,7 @@ void sfs_print( object o ) {
       if(car(o)->type == SFS_SYMBOL){
           sfs_print_atom(car(o));
       }
-      else if(cdr(o)->type != SFS_PAIR && cdr(o) != nil){
+      else if(cdr(o)->type != SFS_PAIR && cdr(o) != nil){ /*Printing pairs from cons primitive procedure*/
           sfs_print_atom(car(o));
           printf(" . ");
           sfs_print_atom(cdr(o));

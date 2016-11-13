@@ -74,8 +74,13 @@ void initialize_formes(void){
 }
 
 void initialize_primitives(void){
-  initialize_primitive("+", primitive_add);
 
-  initialize_primitive("cons", primitive_cons);
+  initialize_primitive("null?", is_null_primitive);
+
+  initialize_primitive("char->integer", char_to_integer_primitive);
+
+  initialize_primitive("+", integer_add_primitive);
+  
+  initialize_primitive("cons", cons_primitive);
 
 }
