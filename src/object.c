@@ -81,6 +81,8 @@ object make_symbol ( string symbol ){
     object symbol_pair = make_pair();
     symbol_pair->this.pair.car = make_object(SFS_SYMBOL);
     symbol_pair->this.pair.car = symbol_name;
+    symbol_pair->this.pair.cdr = NULL;
+
     symbol_index->this.pair.car = make_pair();
     symbol_index->this.pair.car = symbol_pair;
 
@@ -102,7 +104,7 @@ object make_primitive (primitive function){
 }
 
 object make_pair ( void ){
-  
+
     object t = make_object ( SFS_PAIR );
     t->this.pair.cdr = nil;
     return t;

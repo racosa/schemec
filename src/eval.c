@@ -87,7 +87,7 @@ object sfs_eval( object input ) {
                 symbol->this.pair.car = NULL;
                 symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
 
-                if(cdr(car(symbol)) != nil){
+                if(cdr(car(symbol)) != NULL){
                   object old_symbol_value = make_object(cdr(car(symbol))->type);
                   old_symbol_value = cdr(car(symbol));
                   symbol->this.pair.car->this.pair.cdr = sfs_eval(car(cdr(cdr(input))));
@@ -169,8 +169,14 @@ object sfs_eval( object input ) {
               primitive primitive_function = cdr(car(input))->this.primitive.function;
               object arguments = nil;
               while(cdr(input) != nil){
-                arguments = cons(sfs_eval(car(cdr(input))), arguments);
-                input = cdr(input);
+                object evaluated_argument = sfs_eval(car(cdr(input)));
+                if(evaluated_argument){
+                  arguments = cons(evaluated_argument, arguments);
+                  input = cdr(input);
+                }
+                else{
+                  return NULL;
+                }
               }
               return primitive_function(arguments);
             }
@@ -179,7 +185,7 @@ object sfs_eval( object input ) {
             else if(car(input)->type == SFS_SYMBOL){
                 object symbol;
                 symbol = search_symbol_in_environment( car(input)->this.symbol );
-                if(cdr(car(symbol)) != nil  ){
+                if(cdr(car(symbol)) != NULL ){
                   DEBUG_MSG("; Variable found in top level environment");
                   return cdr(car(symbol));
                 }
@@ -187,9 +193,8 @@ object sfs_eval( object input ) {
                 return NULL;
               }
 
-              else{
-                WARNING_MSG("; ERROR: wrong type to apply");
-                return NULL;
+            else{
+                return input;
               }
             }
             else{

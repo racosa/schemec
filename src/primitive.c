@@ -28,12 +28,73 @@ object is_null_primitive(object arguments){
   return NULL;
 }
 
-object is_boolean_primitive(object arguments);
-object is_symbol_primitive(object arguments);
-object is_integer_primitive(object arguments);
-object is_char_primitive(object arguments);
-object is_string_primitive(object arguments);
-object is_pair_primitive(object arguments);
+object is_boolean_primitive(object arguments){
+  if(cdr(arguments) == nil){
+    if(car(arguments)->type == SFS_BOOLEAN){
+      return true;
+    }
+    return false;
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure boolean? ");
+  return NULL;
+}
+
+object is_symbol_primitive(object arguments){
+  if(cdr(arguments) == nil){
+    if(car(arguments)->type == SFS_SYMBOL){
+      return true;
+    }
+    return false;
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure symbol? ");
+  return NULL;
+}
+
+object is_integer_primitive(object arguments){
+  if(cdr(arguments) == nil){
+    if(car(arguments)->type == SFS_NUMBER){
+      if(car(arguments)->this.number.numtype == NUM_INTEGER){
+        return true;
+      }
+    }
+    return false;
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure integer? ");
+  return NULL;
+}
+
+object is_char_primitive(object arguments){
+  if(cdr(arguments) == nil){
+    if(car(arguments)->type == SFS_CHARACTER){
+      return true;
+    }
+    return false;
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure char? ");
+  return NULL;
+}
+
+object is_string_primitive(object arguments){
+  if(cdr(arguments) == nil){
+    if(car(arguments)->type == SFS_STRING){
+      return true;
+    }
+    return false;
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure string? ");
+  return NULL;
+}
+
+object is_pair_primitive(object arguments){
+  if(cdr(arguments) == nil){
+    if(car(arguments)->type == SFS_PAIR){
+      return true;
+    }
+    return false;
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure pair? ");
+  return NULL;
+}
 
 /* Type convertion primitives */
 object char_to_integer_primitive(object arguments){
@@ -74,8 +135,7 @@ object number_to_string_primitive(object arguments){
       string buffer;
       init_string(buffer);
       strncpy(buffer, "\"", 2);
-      sprintf(buffer + 1,"%d", number);
-      DEBUG_MSG("number_size = %d", number_size);
+      sprintf(buffer + 1, "%d", number);
       strncpy(buffer + 1 + number_size, "\"", 2);
       object string = make_string(buffer);
       return string;
@@ -89,7 +149,31 @@ object number_to_string_primitive(object arguments){
   return NULL;
 }
 
-object string_to_number_primitive(object arguments);
+object string_to_number_primitive(object arguments){
+  if(cdr(arguments) == nil){
+    if(car(arguments)->type == SFS_STRING){
+      char *endptr;
+      string buffer;
+      int integer;
+      init_string(buffer);
+      char *bffer = sfs_malloc(sizeof(char));
+      strcpy(bffer, car(arguments)->this.string);
+      DEBUG_MSG("car(arguments)->this.string = %s", bffer);
+
+      integer = strtol( bffer, &endptr, 10);
+      DEBUG_MSG("integer = %d", integer );
+      object number = make_number(integer, NUM_INTEGER);
+      return number;
+    }
+    else{
+      WARNING_MSG("; ERROR: argument passed to primitive procedure string->number is not of the correct type");
+      return NULL;
+    }
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure string->number ");
+  return NULL;
+
+}
 object symbol_to_string_primitive(object arguments);
 object string_to_symbol_primitive(object arguments);
 
