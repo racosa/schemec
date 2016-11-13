@@ -7,7 +7,8 @@
  * Definition of the primitive functions for the schemeC interpreter.
  */
 
- #include "primitive.h"
+#include <stdio.h>
+#include "primitive.h"
 
 void initialize_primitive (string symbol, primitive function){
   object symbol_pair = make_symbol(symbol);
@@ -50,8 +51,44 @@ object char_to_integer_primitive(object arguments){
   return NULL;
 }
 
-object integer_to_char_primitive(object arguments);
-object number_to_string_primitive(object arguments);
+object integer_to_char_primitive(object arguments){
+  if(cdr(arguments) == nil){
+    if(car(arguments)->type == SFS_NUMBER){
+      object character = make_character(car(arguments)->this.number.this.integer);
+      return character;
+    }
+    else{
+      WARNING_MSG("; ERROR: argument passed to primitive procedure integer->char is not of the correct type");
+      return NULL;
+    }
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure integer->char ");
+  return NULL;
+}
+
+object number_to_string_primitive(object arguments){
+  if(cdr(arguments) == nil){
+    if(car(arguments)->type == SFS_NUMBER){
+      int number = car(arguments)->this.number.this.integer;
+      int number_size = calculate_number_size(number);
+      string buffer;
+      init_string(buffer);
+      strncpy(buffer, "\"", 2);
+      sprintf(buffer + 1,"%d", number);
+      DEBUG_MSG("number_size = %d", number_size);
+      strncpy(buffer + 1 + number_size, "\"", 2);
+      object string = make_string(buffer);
+      return string;
+    }
+    else{
+      WARNING_MSG("; ERROR: argument passed to primitive procedure number->string is not of the correct type");
+      return NULL;
+    }
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure number->string ");
+  return NULL;
+}
+
 object string_to_number_primitive(object arguments);
 object symbol_to_string_primitive(object arguments);
 object string_to_symbol_primitive(object arguments);
@@ -115,3 +152,18 @@ object list_primitive(object arguments);
 
 /* Polymorphic equality */
 object polymorphic_equality_primitive(object arguments);
+
+int calculate_number_size(int number){
+  int negative_number = 0;
+  if(number < 0) number = (number == INT_MIN) ? INT_MAX : -number, negative_number++;
+  if(number < 10) return 1 + negative_number;
+  if(number < 100) return 2 + negative_number;
+  if(number < 1000) return 3 + negative_number;
+  if(number < 10000) return 4 + negative_number;
+  if(number < 100000) return 5 + negative_number;
+  if(number < 1000000) return 6 + negative_number;
+  if(number < 10000000) return 7 + negative_number;
+  if(number < 100000000) return 8 + negative_number;
+  if(number < 1000000000) return 9 + negative_number;
+  return 10;
+}

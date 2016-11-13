@@ -1,14 +1,7 @@
 ; TEST_RETURN_CODE=PASS
-; TEST_COMMENT= Test * arithmetique
+; TEST_COMMENT= Test remainder arithmetique
 
-(*)
-(* 1)
-(* 2 1)
-(* 3 2 1)
-(* 4 3 2 1)
-(* -20 17)
-(* 10 -10 10 -10)
-(* -25)
-(define x 5)
-(define u -20)
-(* 2 x u)
+(remainder 4 2)
+(remainder -4 2)
+(remainder -4 -2)
+

@@ -17,7 +17,7 @@ void sfs_print_atom( object o ) {
     switch (o->type) {
 
       case SFS_NUMBER:
-        /*printf( "SFS_NUMBER: %d", o->this.number.this.integer );*/
+      /*printf( "SFS_NUMBER: %d", o->this.number.this.integer );*/
         switch (o->this.number.numtype) {
           case NUM_PINFTY:
             printf( "+inf" );
@@ -50,7 +50,7 @@ void sfs_print_atom( object o ) {
       break;
 
       case SFS_STRING:
-        /*printf( "SFS_STRING: %s", o->this.string );*/
+      /*printf( "SFS_STRING: %s", o->this.string );*/
         printf( "%s", o->this.string );
       break;
 

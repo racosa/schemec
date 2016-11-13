@@ -14,6 +14,7 @@
 extern "C" {
 #endif
 
+#include <limits.h>
 #include "object.h"
 #include "environment.h"
 
@@ -51,6 +52,8 @@ object set_cdr_primitive(object arguments);
 object list_primitive(object arguments);
 
 object polymorphic_equality_primitive(object arguments);
+
+int calculate_number_size(int number);
 
 #ifdef __cplusplus
 }
