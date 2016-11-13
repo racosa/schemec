@@ -13,7 +13,6 @@
 (boolean? #\newline)
 (boolean? "")
 (boolean? "oui")
-(boolean? (1))
 (boolean? (1 2))
 (define u #f)
 (boolean? u)

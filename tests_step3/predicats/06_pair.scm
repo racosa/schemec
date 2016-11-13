@@ -13,7 +13,6 @@
 (pair? #\newline)
 (pair? "")
 (pair? "vrai")
-(pair? (1))
 (pair? (1 2))
 (define r (3 4))
 (pair? r)
