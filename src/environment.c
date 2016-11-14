@@ -106,7 +106,6 @@ void initialize_primitives(void){
   initialize_primitive("set-car!", set_car_primitive);
   initialize_primitive("set-cdr!", set_cdr_primitive);
 
-/*
   initialize_primitive("eq?", polymorphic_equality_primitive);
-*/
+
 }

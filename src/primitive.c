@@ -470,7 +470,47 @@ object list_primitive(object arguments){
 }
 
 /* Polymorphic equality */
-object polymorphic_equality_primitive(object arguments);
+object polymorphic_equality_primitive(object arguments){
+  if(car(arguments) && cdr(arguments) != nil){
+      if(car(arguments)->type == SFS_NUMBER && car(cdr(arguments))->type == SFS_NUMBER){
+        if(car(arguments)->this.number.this.integer == car(cdr(arguments))->this.number.this.integer){
+          return true;
+        }
+        else{
+          return false;
+        }
+      }
+      else if(car(arguments)->type == SFS_CHARACTER && car(cdr(arguments))->type == SFS_CHARACTER){
+        if(car(arguments)->this.character == car(cdr(arguments))->this.character){
+          return true;
+        }
+        else{
+          return false;
+        }
+      }
+      else if(car(arguments)->type == SFS_BOOLEAN && car(cdr(arguments))->type == SFS_BOOLEAN){
+        if(car(arguments) == car(cdr(arguments))){
+          return true;
+        }
+        else{
+          return false;
+        }
+      }
+      else if(car(arguments)->type == SFS_STRING){
+          return false;
+      }
+
+      else if(!strcmp( car(arguments)->this.symbol, car(cdr(arguments))->this.symbol )){
+          return true;
+      }
+      else{
+        return false;
+      }
+    }
+  else{
+    return true;
+  }
+}
 
 int calculate_number_size(int number){
   int negative_number = 0;
