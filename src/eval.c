@@ -168,6 +168,7 @@ object sfs_eval( object input ) {
               DEBUG_MSG("; primitive \" %s \" detected", caar(input)->this.symbol);
               primitive primitive_function = cdr(car(input))->this.primitive.function;
               object arguments = nil;
+              object reverse_arguments = nil;
               while(cdr(input) != nil){
                 object evaluated_argument = sfs_eval(car(cdr(input)));
                 if(evaluated_argument){
@@ -178,7 +179,11 @@ object sfs_eval( object input ) {
                   return NULL;
                 }
               }
-              return primitive_function(arguments);
+              while(arguments != nil){
+                reverse_arguments = cons(car(arguments), reverse_arguments);
+                arguments = cdr(arguments);
+              }
+              return primitive_function(reverse_arguments);
             }
 
             /* Implementing symbol evaluation. */

@@ -231,15 +231,58 @@ object integer_addition_primitive(object arguments){
       arguments = cdr(arguments);
     }
     else{
-      WARNING_MSG("; ERROR: argument passed to primitive procedure integer-add is not of the correct type");
+      WARNING_MSG("; ERROR: argument passed to primitive procedure integer-addition is not of the correct type");
       return NULL;
     }
   }
   return result;
 }
 
-object integer_subtraction_primitive(object arguments);
-object integer_multiplication_primitive(object arguments);
+object integer_subtraction_primitive(object arguments){
+  object result;
+  if(cdr(arguments) == nil){
+    result = make_number(-car(arguments)->this.number.this.integer, NUM_INTEGER);
+  }
+  else{
+    result = make_number(car(arguments)->this.number.this.integer, NUM_INTEGER);
+  }
+  arguments = cdr(arguments);
+  while (arguments != nil) {
+    object operand = car(arguments);
+    if (operand->type == SFS_NUMBER) {
+      result->this.number.this.integer -= operand->this.number.this.integer;
+      arguments = cdr(arguments);
+    }
+    else{
+      WARNING_MSG("; ERROR: argument passed to primitive procedure integer-subtraction is not of the correct type");
+      return NULL;
+    }
+  }
+  return result;
+}
+
+object integer_multiplication_primitive(object arguments){
+  if(car(arguments)){
+    object result = make_number(car(arguments)->this.number.this.integer, NUM_INTEGER);
+    arguments = cdr(arguments);
+    while (arguments != nil) {
+      object operand = car(arguments);
+      if (operand->type == SFS_NUMBER) {
+        result->this.number.this.integer *= operand->this.number.this.integer;
+        arguments = cdr(arguments);
+      }
+      else{
+        WARNING_MSG("; ERROR: argument passed to primitive procedure integer-multiplication is not of the correct type");
+        return NULL;
+      }
+    }
+    return result;
+  }
+  else{
+    return make_number(1, NUM_INTEGER);
+  }
+}
+
 object integer_quotient_primitive(object arguments);
 object integer_remainder_primitive(object arguments);
 object integer_equal_primitive(object arguments);

@@ -91,10 +91,9 @@ void initialize_primitives(void){
   initialize_primitive("string->symbol", string_to_symbol_primitive);
 
   initialize_primitive("+", integer_addition_primitive);
-/*
   initialize_primitive("-", integer_subtraction_primitive);
   initialize_primitive("*", integer_multiplication_primitive);
-  initialize_primitive("quotient", integer_quotient_primitive);
+/*  initialize_primitive("quotient", integer_quotient_primitive);
   initialize_primitive("remainder", integer_remainder_primitive);
   initialize_primitive("=", integer_equal_primitive);
   initialize_primitive("<", integer_less_primitive);
