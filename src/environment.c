@@ -88,8 +88,8 @@ void initialize_primitives(void){
   initialize_primitive("number->string", number_to_string_primitive);
   initialize_primitive("string->number", string_to_number_primitive);
   initialize_primitive("symbol->string", symbol_to_string_primitive);
-/*  initialize_primitive("string->symbol", string_to_symbol_primitive);
-*/
+  initialize_primitive("string->symbol", string_to_symbol_primitive);
+
   initialize_primitive("+", integer_addition_primitive);
 /*
   initialize_primitive("-", integer_subtraction_primitive);
@@ -103,7 +103,7 @@ void initialize_primitives(void){
   initialize_primitive("cons", cons_primitive);
   initialize_primitive("car", car_primitive);
   initialize_primitive("cdr", cdr_primitive);
-/*initialize_primitive("set-car!", set_car_primitive);
+/*  initialize_primitive("set-car!", set_car_primitive);
   initialize_primitive("set-cdr!", set_cdr_primitive);
   initialize_primitive("list", list_primitive);
 

@@ -196,11 +196,30 @@ object symbol_to_string_primitive(object arguments){
   }
   WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure symbol->string ");
   return NULL;
-
-
 }
 
-object string_to_symbol_primitive(object arguments);
+object string_to_symbol_primitive(object arguments){
+  if(cdr(arguments) == nil){
+    if(car(arguments)->type == SFS_STRING){
+      int i = 0;
+      string buffer;
+      init_string(buffer);
+      strcpy(buffer, car(arguments)->this.string + 1);
+      while(buffer[i] != '\0'){
+        i++;
+      }
+      buffer[i-1] = '\0';
+      object symbol = make_symbol(buffer);
+      return symbol;
+    }
+    else{
+      WARNING_MSG("; ERROR: argument passed to primitive procedure string->symbol is not of the correct type");
+      return NULL;
+    }
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure string->symbol ");
+  return NULL;
+}
 
 /* Integer arithmetic primitives */
 object integer_addition_primitive(object arguments){
