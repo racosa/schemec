@@ -102,10 +102,11 @@ void initialize_primitives(void){
   initialize_primitive("cons", cons_primitive);
   initialize_primitive("car", car_primitive);
   initialize_primitive("cdr", cdr_primitive);
-/*  initialize_primitive("set-car!", set_car_primitive);
-  initialize_primitive("set-cdr!", set_cdr_primitive);
   initialize_primitive("list", list_primitive);
+  initialize_primitive("set-car!", set_car_primitive);
+  initialize_primitive("set-cdr!", set_cdr_primitive);
 
+/*
   initialize_primitive("eq?", polymorphic_equality_primitive);
 */
 }

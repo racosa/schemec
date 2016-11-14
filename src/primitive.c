@@ -9,6 +9,8 @@
 
 #include <stdio.h>
 #include "primitive.h"
+#include "print.h"
+#include "mem.h"
 
 void initialize_primitive (string symbol, primitive function){
   object symbol_pair = make_symbol(symbol);
@@ -431,9 +433,41 @@ object cdr_primitive(object arguments){
   return NULL;
 }
 
-object set_car_primitive(object arguments);
-object set_cdr_primitive(object arguments);
-object list_primitive(object arguments);
+object set_car_primitive(object arguments){
+  if(car(arguments)){
+    if(car(arguments)->type == SFS_PAIR){
+      object old_car = caar(arguments);
+      arguments->this.pair.car->this.pair.car = car(cdr(arguments));
+      return old_car;
+    }
+    else{
+      WARNING_MSG("; ERROR: argument passed to primitive procedure set-car! is not of the correct type");
+      return NULL;
+    }
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure set-car! ");
+  return NULL;
+}
+
+object set_cdr_primitive(object arguments){
+  if(car(arguments)){
+    if(car(arguments)->type == SFS_PAIR){
+      object old_cdr = cdr(car(arguments));
+      arguments->this.pair.car->this.pair.cdr = car(cdr(arguments));
+      return old_cdr;
+    }
+    else{
+      WARNING_MSG("; ERROR: argument passed to primitive procedure set-cdr! is not of the correct type");
+      return NULL;
+    }
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure set-cdr! ");
+  return NULL;
+}
+
+object list_primitive(object arguments){
+  return arguments;
+}
 
 /* Polymorphic equality */
 object polymorphic_equality_primitive(object arguments);

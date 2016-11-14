@@ -6,8 +6,8 @@
 (set-cdr! x 5)
 x
 (define x (cons 4 (cons 5 (cons 6 ()))))
-(set-car! x 4)
-(set-cdr! x (quote (5 6)))
+(set-car! x 3)
+(set-cdr! x (quote (7 8)))
 x
 (define x (cons 1 (cons 2 (cons 3 ()))))
 (set-car! x (cons 3 (cons 4 ())))
