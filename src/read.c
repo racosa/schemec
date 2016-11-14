@@ -391,7 +391,8 @@ object sfs_read_atom( char *input, uint *here ) {
                 DEBUG_MSG("; Atome identified of type: SFS_NUMBER -> Value: -inf " );
               }
             }
-            else if (errno != 0 && number_input == 0){
+            else if ( (!isspace(*endptr) && (*endptr) != END_OF_STRING && (*endptr) != OPENING_PARENTHESIS
+            && (*endptr) != CLOSING_PARENTHESIS )  || (errno != 0 && number_input == 0) ){
               WARNING_MSG("; Error converting string to number.");
               return 0;
             }

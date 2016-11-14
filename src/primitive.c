@@ -176,7 +176,30 @@ object string_to_number_primitive(object arguments){
   return NULL;
 
 }
-object symbol_to_string_primitive(object arguments);
+object symbol_to_string_primitive(object arguments){
+  if(cdr(arguments) == nil){
+    if(car(arguments)->type == SFS_PAIR){
+      if(caar(arguments)->type == SFS_SYMBOL){
+        string buffer;
+        init_string(buffer);
+        strncpy(buffer, "\"", 2);
+        strcpy(buffer + 1, caar(arguments)->this.symbol);
+        strncpy(buffer + 1 + strlen(caar(arguments)->this.symbol), "\"", 2);
+        object string = make_string(buffer);
+        return string;
+      }
+    }
+    else{
+      WARNING_MSG("; ERROR: argument passed to primitive procedure symbol->string is not of the correct type");
+      return NULL;
+    }
+  }
+  WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure symbol->string ");
+  return NULL;
+
+
+}
+
 object string_to_symbol_primitive(object arguments);
 
 /* Integer arithmetic primitives */

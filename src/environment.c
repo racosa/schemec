@@ -87,8 +87,8 @@ void initialize_primitives(void){
   initialize_primitive("integer->char", integer_to_char_primitive);
   initialize_primitive("number->string", number_to_string_primitive);
   initialize_primitive("string->number", string_to_number_primitive);
-/*  initialize_primitive("symbol->string", symbol_to_string_primitive);
-  initialize_primitive("string->symbol", string_to_symbol_primitive);
+  initialize_primitive("symbol->string", symbol_to_string_primitive);
+/*  initialize_primitive("string->symbol", string_to_symbol_primitive);
 */
   initialize_primitive("+", integer_addition_primitive);
 /*
