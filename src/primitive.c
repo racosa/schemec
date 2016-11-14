@@ -240,26 +240,32 @@ object integer_addition_primitive(object arguments){
 
 object integer_subtraction_primitive(object arguments){
   if(car(arguments)){
-    object result;
-    if(cdr(arguments) == nil){
-      result = make_number(-car(arguments)->this.number.this.integer, NUM_INTEGER);
-    }
-    else{
-      result = make_number(car(arguments)->this.number.this.integer, NUM_INTEGER);
-    }
-    arguments = cdr(arguments);
-    while (arguments != nil) {
-      object operand = car(arguments);
-      if (operand->type == SFS_NUMBER) {
-        result->this.number.this.integer -= operand->this.number.this.integer;
-        arguments = cdr(arguments);
+    if(car(arguments)->type == SFS_NUMBER){
+      object result;
+      if(cdr(arguments) == nil){
+        result = make_number(-car(arguments)->this.number.this.integer, NUM_INTEGER);
       }
       else{
-        WARNING_MSG("; ERROR: argument passed to primitive procedure integer-subtraction is not of the correct type");
-        return NULL;
+        result = make_number(car(arguments)->this.number.this.integer, NUM_INTEGER);
       }
+      arguments = cdr(arguments);
+      while (arguments != nil) {
+        object operand = car(arguments);
+        if (operand->type == SFS_NUMBER) {
+          result->this.number.this.integer -= operand->this.number.this.integer;
+          arguments = cdr(arguments);
+        }
+        else{
+          WARNING_MSG("; ERROR: argument passed to primitive procedure integer-subtraction is not of the correct type");
+          return NULL;
+        }
+      }
+      return result;
     }
-    return result;
+    else{
+      WARNING_MSG("; ERROR: argument passed to primitive procedure integer-subtraction is not of the correct type");
+      return NULL;
+    }
   }
   else{
     WARNING_MSG("; ERROR: wrong number of arguments given to primitive procedure integer-subtraction");
@@ -328,9 +334,74 @@ object integer_remainder_primitive(object arguments){
   return NULL;
 }
 
-object integer_equal_primitive(object arguments);
-object integer_less_primitive(object arguments);
-object integer_greater_primitive(object arguments);
+object integer_equal_primitive(object arguments){
+  if(car(arguments) && cdr(arguments) != nil){
+    while(cdr(arguments) != nil){
+      if(car(arguments)->type == SFS_NUMBER && car(cdr(arguments))->type == SFS_NUMBER){
+        if(car(arguments)->this.number.this.integer == car(cdr(arguments))->this.number.this.integer){
+          arguments = cdr(arguments);
+        }
+        else{
+          return false;
+        }
+      }
+      else{
+        WARNING_MSG("; ERROR: argument passed to primitive procedure integer-equality is not of the correct type");
+        return NULL;
+      }
+    }
+    return true;
+  }
+  else{
+    return true;
+  }
+}
+
+object integer_less_primitive(object arguments){
+  if(car(arguments) && cdr(arguments) != nil){
+    while(cdr(arguments) != nil){
+      if(car(arguments)->type == SFS_NUMBER && car(cdr(arguments))->type == SFS_NUMBER){
+        if(car(arguments)->this.number.this.integer < car(cdr(arguments))->this.number.this.integer){
+          arguments = cdr(arguments);
+        }
+        else{
+          return false;
+        }
+      }
+      else{
+        WARNING_MSG("; ERROR: argument passed to primitive procedure integer-less is not of the correct type");
+        return NULL;
+      }
+    }
+    return true;
+  }
+  else{
+    return true;
+  }
+}
+
+object integer_greater_primitive(object arguments){
+  if(car(arguments) && cdr(arguments) != nil){
+    while(cdr(arguments) != nil){
+      if(car(arguments)->type == SFS_NUMBER && car(cdr(arguments))->type == SFS_NUMBER){
+        if(car(arguments)->this.number.this.integer > car(cdr(arguments))->this.number.this.integer){
+          arguments = cdr(arguments);
+        }
+        else{
+          return false;
+        }
+      }
+      else{
+        WARNING_MSG("; ERROR: argument passed to primitive procedure integer-less is not of the correct type");
+        return NULL;
+      }
+    }
+    return true;
+  }
+  else{
+    return true;
+  }
+}
 
 /* List manipulation primitives */
 object cons_primitive(object arguments){

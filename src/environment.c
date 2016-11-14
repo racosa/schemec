@@ -95,10 +95,10 @@ void initialize_primitives(void){
   initialize_primitive("*", integer_multiplication_primitive);
   initialize_primitive("quotient", integer_quotient_primitive);
   initialize_primitive("remainder", integer_remainder_primitive);
-/*  initialize_primitive("=", integer_equal_primitive);
+  initialize_primitive("=", integer_equal_primitive);
   initialize_primitive("<", integer_less_primitive);
   initialize_primitive(">", integer_greater_primitive);
-*/
+
   initialize_primitive("cons", cons_primitive);
   initialize_primitive("car", car_primitive);
   initialize_primitive("cdr", cdr_primitive);
