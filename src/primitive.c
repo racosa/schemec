@@ -158,15 +158,12 @@ object string_to_number_primitive(object arguments){
   if(cdr(arguments) == nil){
     if(car(arguments)->type == SFS_STRING){
       char *endptr;
-      string buffer;
-      int integer;
-      init_string(buffer);
-      char *bffer = sfs_malloc(sizeof(char));
-      strcpy(bffer, car(arguments)->this.string);
-      DEBUG_MSG("car(arguments)->this.string = %s", bffer);
-
-      integer = strtol( bffer, &endptr, 10);
-      DEBUG_MSG("integer = %d", integer );
+      long integer;
+      errno = 0;
+      integer = strtol( car(arguments)->this.string + 1, &endptr, 10 );
+      if(*endptr != '\"' || (errno != 0 && integer == 0)) {
+        return false;
+      }
       object number = make_number(integer, NUM_INTEGER);
       return number;
     }
