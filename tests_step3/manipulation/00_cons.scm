@@ -1,0 +1,15 @@
+; TEST_RETURN_CODE=PASS
+; TEST_COMMENT= Test cons manipulation (build an pair)
+
+(cons 3 ())
+(cons () ())
+(cons 3 (cons 4 ()))
+(cons 3 (cons 4 (cons 5 ())))
+(cons #t (cons #\a (cons 3 ())))
+(define x 51)
+(cons x ())
+(cons (quote (3 4 5)) ())
+(cons '(x (< 3 4)) ())
+(cons x (cons (< -57 42 87) (cons (quote 4) (cons (= 3 3 4) ()))))
+(cons 3 4)
+(cons 1 (cons 89 48))

@@ -1,0 +1,15 @@
+; TEST_RETURN_CODE=PASS
+; TEST_COMMENT= Test car e cdr manipulations fonctions (Show respectively the car and the cdr of the pair)
+
+(define x (cons 3 ()))
+(car x)
+(cdr x)
+(define t (cons #t (cons 4 (cons 87 (cons 89 ())))))
+(car t)
+(cdr t)
+(define r (cons (quote (3 4 5)) (cons (quote (6 7 8)) ())))
+(car r)
+(cdr r)
+(define x (cons (< 3 4) (cons (*) ())))
+(car x)
+(cdr x)
