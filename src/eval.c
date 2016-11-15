@@ -111,16 +111,23 @@ object sfs_eval( object input ) {
               if(cdr(cdr(cdr(cdr(input)))) == nil){
 
                 DEBUG_MSG("; \" if \" forme detected");
-                if(sfs_eval(car(cdr(input))) != false){
-                  DEBUG_MSG("; (predicate) is (true), evaluating (consequence)");
-                  input = car(cdr(cdr(input)));
+                object predicate = sfs_eval(car(cdr(input)));
+                if(predicate){
+                  if(predicate != false){
+                    DEBUG_MSG("; (predicate) is (true), evaluating (consequence)");
+                    input = car(cdr(cdr(input)));
+                  }
+                  else{
+                    DEBUG_MSG("; (predicate) is (false), evaluating (alternative)");
+                    input = car(cdr(cdr(cdr(input))));
+                  }
+                  /*Goto begin of eval function*/
+                  goto eval;
                 }
                 else{
-                  DEBUG_MSG("; (predicate) is (false), evaluating (alternative)");
-                  input = car(cdr(cdr(cdr(input))));
+                /*  WARNING_MSG("; ERROR: if: object in predicate is not applicable"); */
+                  return NULL;
                 }
-                /*Goto begin of eval function*/
-                goto eval;
               }
               else {
                 WARNING_MSG("; ERROR: if: missing or extra arguments");
