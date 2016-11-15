@@ -60,7 +60,7 @@ int main ( int argc, char *argv[] ) {
     WARNING_MSG("Un message WARNING_MSG !");*/
 
     /* macro INFO_MSG : uniquement si compil avec -DVERBOSE. Cf Makefile*/
-    INFO_MSG(" Scheme interpreter - version 0.2 ");
+    INFO_MSG(" Scheme interpreter - version 0.3 ");
     INFO_MSG(" Press ctrl+c to Exit ");
     INFO_MSG("-----------------------------------");
     /* macro DEBUG_MSG : uniquement si compil avec -DDEBUG (ie : compil avec make debug). Cf Makefile

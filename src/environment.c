@@ -70,10 +70,11 @@ void initialize_formes(void){
     symbol_pair->this.pair.car = symbol_name;
     insert_symbol_in_environment(symbol_pair);
   }
-  DEBUG_MSG("; ----------------------------------------- Completed");
+  DEBUG_MSG("; ---------------------------------------- Completed");
 }
 
 void initialize_primitives(void){
+  DEBUG_MSG("; Initializing primitives in the top level environment..");
 
   initialize_primitive("null?", is_null_primitive);
   initialize_primitive("boolean?", is_boolean_primitive);
@@ -108,4 +109,5 @@ void initialize_primitives(void){
 
   initialize_primitive("eq?", polymorphic_equality_primitive);
 
+  DEBUG_MSG("; ------------------------------------------- Completed");
 }

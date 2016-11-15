@@ -26,6 +26,17 @@ object sfs_eval( object input ) {
 
           if(input->type == SFS_PAIR){
 
+            if( is_begin(caar(input)) ){
+              DEBUG_MSG("; \" begin \" forme detected");
+              object result = NULL;
+              object begin_input = cdr(input);
+              while(begin_input != nil){
+                result = sfs_eval(car(begin_input));
+                begin_input = cdr(begin_input);
+              }
+              return result;
+            }
+
             /* Implementing quote forme evaluation. */
             if( is_quote(caar(input)) ){
               if( cdr(cdr(input)) == nil ){
@@ -287,9 +298,18 @@ int is_or( object object ){
   return FALSE;
 }
 
+int is_begin( object object ){
+  if(object){
+    if ( !strcmp(object->this.symbol, "begin" ) ){
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
 int is_forme(object symbol){
     if(is_quote(symbol) || is_define(symbol) || is_set(symbol)
-       || is_if(symbol) || is_and(symbol) || is_or(symbol)){
+       || is_if(symbol) || is_and(symbol) || is_or(symbol) || is_begin(symbol)){
       return TRUE;
     }
     return FALSE;

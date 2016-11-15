@@ -28,6 +28,7 @@ int is_if( object object );
 int is_and( object object );
 int is_or( object object );
 int is_primitive( object object );
+int is_begin( object object );
 
 #ifdef __cplusplus
 }
