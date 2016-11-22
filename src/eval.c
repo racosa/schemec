@@ -20,7 +20,7 @@ object sfs_eval( object input ) {
       if(input->type == SFS_NUMBER || input->type == SFS_CHARACTER
          || input->type == SFS_STRING || input->type == SFS_BOOLEAN || input->type == SFS_NIL){
            return input;
-         }
+      }
 
       else{
 
@@ -32,7 +32,12 @@ object sfs_eval( object input ) {
               object begin_input = cdr(input);
               while(begin_input != nil){
                 result = sfs_eval(car(begin_input));
-                begin_input = cdr(begin_input);
+                if(result){
+                  begin_input = cdr(begin_input);
+                }
+                else{
+                  return NULL;
+                }
               }
               return result;
             }
@@ -60,7 +65,7 @@ object sfs_eval( object input ) {
 
                 symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
                 if(cdr(car(symbol)) != nil ){
-                  DEBUG_MSG("; Variable already exists in top level environment: modyfing.. ");
+                  DEBUG_MSG("; Variable already exists in top level environment: modyfing..");
                   symbol_value = sfs_eval(car(cdr(cdr(input))));
                   if(symbol_value) {
                     symbol->this.pair.car->this.pair.cdr = symbol_value;
@@ -119,7 +124,7 @@ object sfs_eval( object input ) {
             /* Implementing if forme evaluation. */
             else if(is_if(caar(input))){
 
-              if(cdr(cdr(cdr(cdr(input)))) == nil){
+              if(cdr(cdr(cdr(cdr(input)))) == nil || cdr(cdr(cdr(input)))){
 
                 DEBUG_MSG("; \" if \" forme detected");
                 object predicate = sfs_eval(car(cdr(input)));
@@ -131,6 +136,7 @@ object sfs_eval( object input ) {
                   else{
                     DEBUG_MSG("; (predicate) is (false), evaluating (alternative)");
                     input = car(cdr(cdr(cdr(input))));
+
                   }
                   /*Goto begin of eval function*/
                   goto eval;
@@ -162,8 +168,6 @@ object sfs_eval( object input ) {
               }
                 return sfs_eval(car(input));
               }
-
-
 
             /* Implementing or forme evaluation. */
             else if(is_or(caar(input))){
