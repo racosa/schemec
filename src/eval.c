@@ -25,15 +25,39 @@ object sfs_eval( object input ) {
       else{
 
           if(input->type == SFS_PAIR){
+            /*Fixing (begin ...) input*/
+            if(car(input)->type == SFS_PAIR){
+              if (car(caar(input))){
+                if(is_begin(car(caar(input)))){
+                  DEBUG_MSG("; \" begin \" forme detected");
+                  object begin_result = NULL;
+                  object begin_input = car(input);
+                  object begin_input_argument = cdr(begin_input);
 
+                  while (begin_input_argument != nil) {
+                    begin_result = sfs_eval(car(begin_input_argument));
+                    if(begin_result){
+                      begin_input_argument = cdr(begin_input_argument);
+                    }
+                    else{
+                      begin_result = NULL;
+                      begin_input_argument = nil;
+                    }
+                  }
+                  input->this.pair.car = begin_result;
+                }
+              }
+            }
+
+            /* Implementing begin forme evaluation. */
             if( is_begin(caar(input)) ){
               DEBUG_MSG("; \" begin \" forme detected");
               object result = NULL;
-              object begin_input = cdr(input);
-              while(begin_input != nil){
-                result = sfs_eval(car(begin_input));
+              object begin_argument = cdr(input);
+              while(begin_argument != nil){
+                result = sfs_eval(car(begin_argument));
                 if(result){
-                  begin_input = cdr(begin_input);
+                  begin_argument = cdr(begin_argument);
                 }
                 else{
                   return NULL;
@@ -210,14 +234,26 @@ object sfs_eval( object input ) {
 
             /* Implementing symbol evaluation. */
             else if(car(input)->type == SFS_SYMBOL){
+
+              if(is_primitive(input)){
+                 return input;
+              }
+              else{
+
                 object symbol;
                 symbol = search_symbol_in_environment( car(input)->this.symbol );
                 if(cdr(car(symbol)) != NULL ){
                   DEBUG_MSG("; Variable found in top level environment");
                   return cdr(car(symbol));
+
                 }
                 WARNING_MSG("; ERROR: unbound variable: %s", car(car(symbol))->this.symbol );
                 return NULL;
+
+
+              }
+
+
               }
 
             else{
@@ -235,6 +271,7 @@ object sfs_eval( object input ) {
         }
     }
     else{
+      DEBUG_MSG("exception returning NULL");
       return NULL;
     }
 }

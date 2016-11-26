@@ -76,6 +76,9 @@ void sfs_print_atom( object o ) {
         /*printf("SFS_NIL: ()");*/
         printf("()");
       break;
+      case SFS_PRIMITIVE:
+        printf("#<primitive-procedure>");
+      break;
       default:
         WARNING_MSG("EXCEPTION in print_atom() function");
       break;
@@ -104,8 +107,12 @@ void sfs_print_pair( object o ) {
 }
 
 void sfs_print( object o ) {
+
     if ( SFS_PAIR == o->type ) {
-      if(car(o)->type == SFS_SYMBOL){
+      if(cdr(o)->type == SFS_PRIMITIVE){
+        sfs_print_atom(cdr(o));
+      }
+      else if(car(o)->type == SFS_SYMBOL){
           sfs_print_atom(car(o));
       }
       else if(cdr(o)->type != SFS_PAIR && cdr(o) != nil){ /*Printing pairs from cons primitive procedure*/
