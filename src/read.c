@@ -17,6 +17,7 @@
 #include "read.h"
 #include "mem.h"
 #include "print.h"
+#include "environment.h"
 
 
 void flip( uint *i ) {
@@ -484,7 +485,7 @@ object sfs_read_atom( char *input, uint *here ) {
             atom_size = (*here)- here_init;
             init_string(atom_input);
             strncpy(atom_input, &input[here_init], atom_size);
-            atom = make_symbol( atom_input );
+            atom = make_symbol( atom_input, top_level_environment );
             DEBUG_MSG("; Atome identified of type: SFS_SYMBOL -> Value: %s ", atom->this.pair.car->this.symbol );
             atom_found = TRUE;
           }

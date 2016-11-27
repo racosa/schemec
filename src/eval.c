@@ -30,40 +30,37 @@ object sfs_eval( object input, object target_environment ) {
               if (car(caar(input))){
                 if(is_begin(car(caar(input)))){
                   DEBUG_MSG("; \" begin \" forme detected");
-                  object begin_result = NULL;
                   object begin_input = car(input);
-                  object begin_input_argument = cdr(begin_input);
-
-                  while (begin_input_argument != nil) {
-                    begin_result = sfs_eval(car(begin_input_argument), target_environment);
-                    if(begin_result){
-                      begin_input_argument = cdr(begin_input_argument);
-                    }
-                    else{
-                      begin_result = NULL;
-                      begin_input_argument = nil;
-                    }
-                  }
-                  input->this.pair.car = begin_result;
+                  object begin_input_arguments = cdr(begin_input);
+                  input->this.pair.car = sequential_eval(begin_input_arguments, target_environment);
+                }
+                if(is_lambda(car(caar(input)))){
+                  DEBUG_MSG("; \" lambda \" forme detected");
+                  make_environment();
+                  object lambda_input = car(input);
+                  object lambda_arguments = car(cdr(input));
+                  object new_compound = make_compound(car(cdr(lambda_input)), car(cdr(cdr(lambda_input))), current_environment);
+                  object symbol_pair = make_pair();
+                  symbol_pair->this.pair.car = caar(new_compound->this.compound.parameters);
+                  symbol_pair->this.pair.cdr = lambda_arguments;
+                  insert_symbol_in_environment(symbol_pair, current_environment);
+                  return sequential_eval( cdr(cdr(lambda_input)), current_environment );
                 }
               }
+            }
+
+            /* Implementing lambda forme evaluation. */
+            if( is_lambda(caar(input)) ){
+              DEBUG_MSG("; \" lambda \" forme detected");
+              make_environment();
+
             }
 
             /* Implementing begin forme evaluation. */
             if( is_begin(caar(input)) ){
               DEBUG_MSG("; \" begin \" forme detected");
-              object result = NULL;
-              object begin_argument = cdr(input);
-              while(begin_argument != nil){
-                result = sfs_eval(car(begin_argument), target_environment);
-                if(result){
-                  begin_argument = cdr(begin_argument);
-                }
-                else{
-                  return NULL;
-                }
-              }
-              return result;
+              object begin_arguments = cdr(input);
+              return sequential_eval(begin_arguments, target_environment);
             }
 
             /* Implementing quote forme evaluation. */
@@ -89,7 +86,6 @@ object sfs_eval( object input, object target_environment ) {
 
                 symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol, target_environment );
                 if(cdr(car(symbol)) != nil ){
-                  DEBUG_MSG("; Variable already exists in top level environment: modyfing..");
                   symbol_value = sfs_eval(car(cdr(cdr(input))), target_environment);
                   if(symbol_value) {
                     symbol->this.pair.car->this.pair.cdr = symbol_value;
@@ -239,22 +235,23 @@ object sfs_eval( object input, object target_environment ) {
                  return input;
               }
               else{
-
                 object symbol;
+                if(target_environment == top_level_environment){
+                  DEBUG_MSG("Searching in top_level_environment..");
+                }
+                if(target_environment == current_environment){
+                  DEBUG_MSG("Searching in current_environment..");
+                }
+
                 symbol = search_symbol_in_environment( car(input)->this.symbol, target_environment );
                 if(cdr(car(symbol)) != NULL ){
-                  DEBUG_MSG("; Variable found in top level environment");
+                  /*DEBUG_MSG("; Variable found in top level environment");*/
                   return cdr(car(symbol));
-
                 }
                 WARNING_MSG("; ERROR: unbound variable: %s", car(car(symbol))->this.symbol );
                 return NULL;
-
-
               }
-
-
-              }
+            }
 
             else{
               /*
@@ -274,6 +271,38 @@ object sfs_eval( object input, object target_environment ) {
       DEBUG_MSG("exception returning NULL");
       return NULL;
     }
+}
+
+object sequential_eval(object arguments, object target_environment){
+  object result = NULL;
+  while(arguments != nil){
+    result = sfs_eval(car(arguments), target_environment);
+    if(result){
+      arguments = cdr(arguments);
+    }
+    else{
+      return NULL;
+    }
+  }
+  return result;
+}
+
+int is_lambda( object object ){
+  if(object){
+    if ( !strcmp(object->this.symbol, "lambda" ) ){
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+int is_begin( object object ){
+  if(object){
+    if ( !strcmp(object->this.symbol, "begin" ) ){
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
 
 int is_primitive( object object ){
@@ -333,15 +362,6 @@ int is_and( object object ){
 int is_or( object object ){
   if(object){
     if ( !strcmp(object->this.symbol, "or" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_begin( object object ){
-  if(object){
-    if ( !strcmp(object->this.symbol, "begin" ) ){
       return TRUE;
     }
   }

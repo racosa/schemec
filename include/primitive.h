@@ -4,7 +4,7 @@
  * @date Sat Nov 12 20:25:33 2016
  * @brief Primitives definition for the schemeC interpreter.
  *
- * Primitives definition for the schemeC interprete.
+ * Primitives definition for the schemeC interpreter.
  */
 
 #ifndef _PRIMITIVE_H_

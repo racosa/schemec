@@ -19,7 +19,7 @@ extern "C" {
 extern object top_level_environment;
 extern object current_environment;
 
-object make_top_level_environment( void );
+void make_top_level_environment( void );
 object insert_symbol_in_environment( object symbol_pair, object target_environment );
 object search_symbol_in_environment( string symbol, object target_environment );
 void make_environment ( void );

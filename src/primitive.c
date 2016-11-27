@@ -13,7 +13,7 @@
 #include "mem.h"
 
 void initialize_primitive (string symbol, primitive function){
-  object symbol_pair = make_symbol(symbol);
+  object symbol_pair = make_symbol(symbol, top_level_environment);
   symbol_pair->this.pair.cdr = make_primitive(function);
   insert_symbol_in_environment(symbol_pair, top_level_environment);
 }
@@ -211,7 +211,7 @@ object string_to_symbol_primitive(object arguments){
         i++;
       }
       buffer[i-1] = '\0';
-      object symbol = make_symbol(buffer);
+      object symbol = make_symbol(buffer, top_level_environment);
       return symbol;
     }
     else{

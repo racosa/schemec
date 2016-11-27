@@ -73,7 +73,7 @@ object make_string ( string string ){
     return t;
 }
 
-object make_symbol ( string symbol ){
+object make_symbol ( string symbol, object target_environment ){
 
     object symbol_name = make_object(SFS_SYMBOL);
     strcpy( symbol_name-> this.symbol, symbol );
@@ -87,12 +87,12 @@ object make_symbol ( string symbol ){
     symbol_index->this.pair.car = symbol_pair;
 
     if(car(top_level_environment) != NULL){
-      symbol_index = search_symbol_in_environment( symbol, top_level_environment );
+      symbol_index = search_symbol_in_environment( symbol, target_environment );
       if (symbol_index){
         return car(symbol_index);
       }
     }
-    symbol_index = insert_symbol_in_environment( symbol_pair, top_level_environment );
+    symbol_index = insert_symbol_in_environment( symbol_pair, target_environment );
     return car(symbol_index);
 }
 

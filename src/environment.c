@@ -12,11 +12,11 @@
 #include "print.h"
 #include "primitive.h"
 
-object make_top_level_environment( void ){
+void make_top_level_environment( void ){
   top_level_environment = make_pair();
   top_level_environment->this.pair.car = make_pair();
   top_level_environment->this.pair.car = NULL;
-  return top_level_environment;
+  /*return top_level_environment;*/
 }
 
 object insert_symbol_in_environment(object symbol_pair, object target_environment){
@@ -38,7 +38,25 @@ object insert_symbol_in_environment(object symbol_pair, object target_environmen
 }
 
 object search_symbol_in_environment(string symbol, object target_environment){
+  object symbol_index = NULL;
+  object environments = target_environment;
 
+  while(environments != nil){
+
+    symbol_index = car(environments);
+    if(symbol_index){
+      while( symbol_index != nil ){
+        if(!strcmp(car(car(symbol_index))->this.symbol, symbol)){
+          return symbol_index;
+        }
+        symbol_index = cdr(symbol_index);
+      }
+    }
+    environments = cdr(environments);
+  }
+  return NULL;
+
+/*
   object symbol_index = car(target_environment);
 
   while( symbol_index != nil ){
@@ -48,6 +66,7 @@ object search_symbol_in_environment(string symbol, object target_environment){
     symbol_index = cdr(symbol_index);
   }
   return NULL;
+  */
 }
 
 void make_environment ( void ){
