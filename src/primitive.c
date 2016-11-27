@@ -15,7 +15,7 @@
 void initialize_primitive (string symbol, primitive function){
   object symbol_pair = make_symbol(symbol);
   symbol_pair->this.pair.cdr = make_primitive(function);
-  insert_symbol_in_environment(symbol_pair);
+  insert_symbol_in_environment(symbol_pair, top_level_environment);
 }
 
 /* Predicate primitives */

@@ -19,7 +19,7 @@ extern "C" {
 #include "object.h"
 #include "primitive.h"
 
-object sfs_eval( object );
+object sfs_eval( object input, object target_environment );
 int is_forme(object symbol);
 int is_quote(object object);
 int is_define( object object );

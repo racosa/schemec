@@ -29,14 +29,16 @@ void usage_error( char *command ) {
     fprintf( stderr, "Usage: %s [file.scm]\n   If no file is given, executes in Shell mode.\n", command );
 }
 
-object environment;
+object top_level_environment;
+object current_environment;
 object nil;
 object true;
 object false;
 
 void init_interpreter ( void ) {
 
-    environment = make_top_level_environment();
+    top_level_environment = make_top_level_environment();
+    current_environment = top_level_environment;
     nil   = make_nil();
     true  = make_boolean();
     false = make_boolean();
@@ -60,7 +62,7 @@ int main ( int argc, char *argv[] ) {
     WARNING_MSG("Un message WARNING_MSG !");*/
 
     /* macro INFO_MSG : uniquement si compil avec -DVERBOSE. Cf Makefile*/
-    INFO_MSG(" Scheme interpreter - version 0.3 ");
+    INFO_MSG(" Scheme interpreter - version 0.4 ");
     INFO_MSG(" Press ctrl+c to Exit ");
     INFO_MSG("-----------------------------------");
     /* macro DEBUG_MSG : uniquement si compil avec -DDEBUG (ie : compil avec make debug). Cf Makefile
@@ -147,7 +149,7 @@ int main ( int argc, char *argv[] ) {
             continue ;
         }
         DEBUG_MSG("---------------------- Evaluating Sexpr (...) -------------------");
-        output = sfs_eval( sexpr );
+        output = sfs_eval( sexpr, top_level_environment );
         DEBUG_MSG("---------------------- Evaluation completed ---------------------");
         DEBUG_MSG(".                                                                 ");
         if( NULL == output) {

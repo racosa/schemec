@@ -13,7 +13,7 @@
 #include "environment.h"
 #include "mem.h"
 
-object sfs_eval( object input ) {
+object sfs_eval( object input, object target_environment ) {
     eval:
     if(input){
       /* Implementing auto-evaluation */
@@ -35,7 +35,7 @@ object sfs_eval( object input ) {
                   object begin_input_argument = cdr(begin_input);
 
                   while (begin_input_argument != nil) {
-                    begin_result = sfs_eval(car(begin_input_argument));
+                    begin_result = sfs_eval(car(begin_input_argument), target_environment);
                     if(begin_result){
                       begin_input_argument = cdr(begin_input_argument);
                     }
@@ -55,7 +55,7 @@ object sfs_eval( object input ) {
               object result = NULL;
               object begin_argument = cdr(input);
               while(begin_argument != nil){
-                result = sfs_eval(car(begin_argument));
+                result = sfs_eval(car(begin_argument), target_environment);
                 if(result){
                   begin_argument = cdr(begin_argument);
                 }
@@ -87,10 +87,10 @@ object sfs_eval( object input ) {
                 object symbol_value = sfs_malloc(sizeof(*symbol_value));
                 symbol->this.pair.car = NULL;
 
-                symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
+                symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol, target_environment );
                 if(cdr(car(symbol)) != nil ){
                   DEBUG_MSG("; Variable already exists in top level environment: modyfing..");
-                  symbol_value = sfs_eval(car(cdr(cdr(input))));
+                  symbol_value = sfs_eval(car(cdr(cdr(input))), target_environment);
                   if(symbol_value) {
                     symbol->this.pair.car->this.pair.cdr = symbol_value;
                     return car(car(symbol));
@@ -101,7 +101,7 @@ object sfs_eval( object input ) {
 
                  }
                  else{
-                  symbol_value = sfs_eval(car(cdr(cdr(input))));
+                  symbol_value = sfs_eval(car(cdr(cdr(input))), target_environment);
                   if(symbol_value){
                     symbol->this.pair.car->this.pair.cdr = symbol_value;
                     return car(car(symbol));
@@ -125,12 +125,12 @@ object sfs_eval( object input ) {
                 DEBUG_MSG("; \" set! \" forme detected");
                 object symbol = make_pair();
                 symbol->this.pair.car = NULL;
-                symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol );
+                symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol, target_environment );
 
                 if(cdr(car(symbol)) != NULL){
                   object old_symbol_value = make_object(cdr(car(symbol))->type);
                   old_symbol_value = cdr(car(symbol));
-                  symbol->this.pair.car->this.pair.cdr = sfs_eval(car(cdr(cdr(input))));
+                  symbol->this.pair.car->this.pair.cdr = sfs_eval(car(cdr(cdr(input))), target_environment);
                   return old_symbol_value;
                 }
                 else{
@@ -151,7 +151,7 @@ object sfs_eval( object input ) {
               if(cdr(cdr(cdr(cdr(input)))) == nil || cdr(cdr(cdr(input)))){
 
                 DEBUG_MSG("; \" if \" forme detected");
-                object predicate = sfs_eval(car(cdr(input)));
+                object predicate = sfs_eval(car(cdr(input)), target_environment);
                 if(predicate){
                   if(predicate != false){
                     DEBUG_MSG("; (predicate) is (true), evaluating (consequence)");
@@ -181,7 +181,7 @@ object sfs_eval( object input ) {
               DEBUG_MSG("; \" and \" forme detected");
               input = cdr(input);
               while(cdr(input) != nil){
-                if(sfs_eval(car(input)) == false){
+                if(sfs_eval(car(input), target_environment) == false){
                   return false;
                 }
                 input = cdr(input);
@@ -190,7 +190,7 @@ object sfs_eval( object input ) {
                   return true;
                 }
               }
-                return sfs_eval(car(input));
+                return sfs_eval(car(input), target_environment);
               }
 
             /* Implementing or forme evaluation. */
@@ -201,12 +201,12 @@ object sfs_eval( object input ) {
                 return false;
               }
               while(cdr(input) != nil){
-                if(sfs_eval(car(input)) != false){
-                  return sfs_eval(car(input));
+                if(sfs_eval(car(input), target_environment) != false){
+                  return sfs_eval(car(input), target_environment);
                 }
                 input = cdr(input);
               }
-              return sfs_eval(car(input));
+              return sfs_eval(car(input), target_environment);
             }
 
             /* Implementing primitive evaluation. */
@@ -216,7 +216,7 @@ object sfs_eval( object input ) {
               object arguments = nil;
               object reverse_arguments = nil;
               while(cdr(input) != nil){
-                object evaluated_argument = sfs_eval(car(cdr(input)));
+                object evaluated_argument = sfs_eval(car(cdr(input)), target_environment);
                 if(evaluated_argument){
                   arguments = cons(evaluated_argument, arguments);
                   input = cdr(input);
@@ -241,7 +241,7 @@ object sfs_eval( object input ) {
               else{
 
                 object symbol;
-                symbol = search_symbol_in_environment( car(input)->this.symbol );
+                symbol = search_symbol_in_environment( car(input)->this.symbol, target_environment );
                 if(cdr(car(symbol)) != NULL ){
                   DEBUG_MSG("; Variable found in top level environment");
                   return cdr(car(symbol));

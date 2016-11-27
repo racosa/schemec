@@ -13,33 +13,33 @@
 #include "primitive.h"
 
 object make_top_level_environment( void ){
-  environment = make_pair();
-  environment->this.pair.car = make_pair();
-  environment->this.pair.car = NULL;
-  return environment;
+  top_level_environment = make_pair();
+  top_level_environment->this.pair.car = make_pair();
+  top_level_environment->this.pair.car = NULL;
+  return top_level_environment;
 }
 
-object insert_symbol_in_environment(object symbol_pair){
+object insert_symbol_in_environment(object symbol_pair, object target_environment){
   object new_symbol_index = make_pair();
   new_symbol_index->this.pair.car = make_pair();
   new_symbol_index->this.pair.car = NULL;
 
-  if(environment->this.pair.car == NULL){
+  if(target_environment->this.pair.car == NULL){
     new_symbol_index->this.pair.car = symbol_pair;
-    environment->this.pair.car = new_symbol_index;
+    target_environment->this.pair.car = new_symbol_index;
   }
   else{
     new_symbol_index->this.pair.car = symbol_pair;
     new_symbol_index->this.pair.cdr = make_pair();
-    new_symbol_index->this.pair.cdr = car(environment);
-    environment->this.pair.car = new_symbol_index;
+    new_symbol_index->this.pair.cdr = car(target_environment);
+    target_environment->this.pair.car = new_symbol_index;
   }
   return new_symbol_index;
 }
 
-object search_symbol_in_environment(string symbol){
+object search_symbol_in_environment(string symbol, object target_environment){
 
-  object symbol_index = car(environment);
+  object symbol_index = car(target_environment);
 
   while( symbol_index != nil ){
     if(!strcmp(car(car(symbol_index))->this.symbol, symbol)){
@@ -48,6 +48,14 @@ object search_symbol_in_environment(string symbol){
     symbol_index = cdr(symbol_index);
   }
   return NULL;
+}
+
+void make_environment ( void ){
+  object new_environment = make_pair();
+  new_environment->this.pair.car = make_pair();
+  new_environment->this.pair.car = NULL;
+  new_environment->this.pair.cdr = current_environment;
+  current_environment = new_environment;
 }
 
 void initialize_formes(void){
@@ -68,7 +76,7 @@ void initialize_formes(void){
   for(i=0 ; i < 6 ; i++){
     strcpy( symbol_name->this.symbol, formes[i] );
     symbol_pair->this.pair.car = symbol_name;
-    insert_symbol_in_environment(symbol_pair);
+    insert_symbol_in_environment(symbol_pair, top_level_environment);
   }
   DEBUG_MSG("; ---------------------------------------- Completed");
 }

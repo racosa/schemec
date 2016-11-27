@@ -109,10 +109,16 @@ void sfs_print_pair( object o ) {
 void sfs_print( object o ) {
 
     if ( SFS_PAIR == o->type ) {
-      if(cdr(o)->type == SFS_PRIMITIVE){
-        sfs_print_atom(cdr(o));
+
+    /* TODO  -- Fix "#<primitive-procedure>"
+    if(cdr(o)){
+        if(cdr(o)->type == SFS_PRIMITIVE){
+          sfs_print_atom(cdr(o));
+        }
       }
-      else if(car(o)->type == SFS_SYMBOL){
+    else
+      */
+      if(car(o)->type == SFS_SYMBOL){
           sfs_print_atom(car(o));
       }
       else if(cdr(o)->type != SFS_PAIR && cdr(o) != nil){ /*Printing pairs from cons primitive procedure*/

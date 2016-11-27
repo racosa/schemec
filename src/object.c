@@ -86,13 +86,13 @@ object make_symbol ( string symbol ){
     symbol_index->this.pair.car = make_pair();
     symbol_index->this.pair.car = symbol_pair;
 
-    if(car(environment) != NULL){
-      symbol_index = search_symbol_in_environment( symbol );
+    if(car(top_level_environment) != NULL){
+      symbol_index = search_symbol_in_environment( symbol, top_level_environment );
       if (symbol_index){
         return car(symbol_index);
       }
     }
-    symbol_index = insert_symbol_in_environment( symbol_pair );
+    symbol_index = insert_symbol_in_environment( symbol_pair, top_level_environment );
     return car(symbol_index);
 }
 
@@ -101,6 +101,15 @@ object make_primitive (primitive function){
   object primitive_function = make_object (SFS_PRIMITIVE);
   primitive_function->this.primitive.function = function;
   return primitive_function;
+}
+
+object make_compound (object parameters, object body, object environment){
+
+  object compound = make_object (SFS_COMPOUND);
+  compound->this.compound.parameters = parameters;
+  compound->this.compound.body = body;
+  compound->this.compound.environment = environment;
+  return compound;
 }
 
 object make_pair ( void ){

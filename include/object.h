@@ -40,6 +40,12 @@ typedef struct object_t {
           struct object_t * (*function)(struct object_t *);
         } primitive;
 
+        struct {
+          struct object_t *parameters;
+          struct object_t *body;
+          struct object_t *environment;
+        } compound;
+
     } this;
 
 } *object;
@@ -59,6 +65,7 @@ object cdr ( object object );
 object caar ( object object );
 object cons(object car, object cdr);
 object make_primitive (primitive function);
+object make_compound (object parameters, object body, object environment);
 
 #define SFS_NUMBER       0x00
 #define SFS_CHARACTER    0x01
@@ -68,6 +75,7 @@ object make_primitive (primitive function);
 #define SFS_BOOLEAN      0x05
 #define SFS_SYMBOL       0x06
 #define SFS_PRIMITIVE    0x07
+#define SFS_COMPOUND     0x08
 
 extern object nil;
 extern object true;
