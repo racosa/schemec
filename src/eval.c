@@ -11,6 +11,7 @@
 #include "eval.h"
 #include "object.h"
 #include "environment.h"
+#include "compound.h"
 #include "mem.h"
 
 object sfs_eval( object input, object target_environment ) {
@@ -36,15 +37,19 @@ object sfs_eval( object input, object target_environment ) {
                 }
                 if(is_lambda(car(caar(input)))){
                   DEBUG_MSG("; \" lambda \" forme detected");
-                  make_environment();
                   object lambda_input = car(input);
-                  object lambda_arguments = car(cdr(input));
-                  object new_compound = make_compound(car(cdr(lambda_input)), car(cdr(cdr(lambda_input))), current_environment);
-                  object symbol_pair = make_pair();
-                  symbol_pair->this.pair.car = caar(new_compound->this.compound.parameters);
-                  symbol_pair->this.pair.cdr = lambda_arguments;
-                  insert_symbol_in_environment(symbol_pair, current_environment);
-                  return sequential_eval( cdr(cdr(lambda_input)), current_environment );
+                  object lambda_arguments = cdr(input);
+                  if(car(cdr(lambda_input)) != nil){
+                    make_environment();
+                    object anonymous_function = make_compound(car(cdr(lambda_input)), cdr(cdr(lambda_input)), current_environment);
+                    if(anonymous_function){
+                      if(bind_compound_arguments(anonymous_function, lambda_arguments)){
+                        return sequential_eval( anonymous_function->this.compound.body, current_environment );
+                      }
+                    }
+                  }
+                  WARNING_MSG("; ERROR: lambda: ill-formed expression");
+                  return NULL;
                 }
               }
             }
@@ -53,7 +58,15 @@ object sfs_eval( object input, object target_environment ) {
             if( is_lambda(caar(input)) ){
               DEBUG_MSG("; \" lambda \" forme detected");
               make_environment();
-
+              object lambda_input = cdr(input);
+              object anonymous_function = make_compound(car(lambda_input), cdr(cdr(lambda_input)), current_environment);
+              if(anonymous_function){
+                return anonymous_function;
+              }
+              else{
+                WARNING_MSG("; ERROR: lambda: ill-formed expression");
+                return NULL;
+              }
             }
 
             /* Implementing begin forme evaluation. */

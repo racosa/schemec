@@ -73,7 +73,8 @@ void make_environment ( void ){
   object new_environment = make_pair();
   new_environment->this.pair.car = make_pair();
   new_environment->this.pair.car = NULL;
-  new_environment->this.pair.cdr = current_environment;
+  new_environment->this.pair.cdr = top_level_environment;  /* Insert in the beginning of the environment list*/
+  /*  new_environment->this.pair.cdr = top_level_environment; -- Insert in the end of the environment list*/
   current_environment = new_environment;
 }
 

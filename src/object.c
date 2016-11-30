@@ -12,6 +12,7 @@
 #include "mem.h"
 #include "environment.h"
 #include "eval.h"
+#include "print.h"
 
 
 object make_object( uint type ) {
@@ -106,10 +107,13 @@ object make_primitive (primitive function){
 object make_compound (object parameters, object body, object environment){
 
   object compound = make_object (SFS_COMPOUND);
-  compound->this.compound.parameters = parameters;
-  compound->this.compound.body = body;
-  compound->this.compound.environment = environment;
-  return compound;
+  if(validate_parameters(parameters)){
+    compound->this.compound.parameters = parameters;
+    compound->this.compound.body = body;
+    compound->this.compound.environment = environment;
+    return compound;
+  }
+  return NULL;
 }
 
 object make_pair ( void ){
@@ -117,6 +121,35 @@ object make_pair ( void ){
     object t = make_object ( SFS_PAIR );
     t->this.pair.cdr = nil;
     return t;
+}
+
+int validate_parameters(object parameters){
+  object variables = parameters;
+
+  if(variables == nil){
+    return TRUE;
+  }
+  else{
+    if(car(variables)){
+      if(caar(variables)){
+        if(variables->type == SFS_PAIR && car(variables)->type == SFS_PAIR && caar(variables)->type == SFS_SYMBOL){
+          while (variables != nil) {
+            if(caar(variables)->type == SFS_SYMBOL){
+              variables = cdr(variables);
+            }
+            else{
+              return FALSE;
+            }
+          }
+          return TRUE;
+        }
+      }
+      else if(variables->type == SFS_PAIR && car(variables)->type == SFS_SYMBOL){
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
 }
 
 object car ( object object ){

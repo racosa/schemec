@@ -17,6 +17,7 @@ extern "C" {
 #include "object.h"
 #include "environment.h"
 
+int bind_compound_arguments (object anonymous_function, object arguments);
 
 
 

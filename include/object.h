@@ -66,6 +66,7 @@ object caar ( object object );
 object cons(object car, object cdr);
 object make_primitive (primitive function);
 object make_compound (object parameters, object body, object environment);
+int validate_parameters(object parameters);
 
 #define SFS_NUMBER       0x00
 #define SFS_CHARACTER    0x01

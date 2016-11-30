@@ -79,6 +79,9 @@ void sfs_print_atom( object o ) {
       case SFS_PRIMITIVE:
         printf("#<primitive-procedure>");
       break;
+      case SFS_COMPOUND:
+        printf("#<procedure>");
+      break;
       default:
         WARNING_MSG("EXCEPTION in print_atom() function");
       break;
