@@ -18,7 +18,7 @@ extern "C" {
 #include "environment.h"
 
 int bind_compound_arguments (object anonymous_function, object arguments);
-
+object eval_argument_list(object values, object environment);
 
 
 #ifdef __cplusplus

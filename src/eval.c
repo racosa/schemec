@@ -40,11 +40,12 @@ object sfs_eval( object input, object target_environment ) {
                   object lambda_input = car(input);
                   object lambda_arguments = cdr(input);
                   if(car(cdr(lambda_input)) != nil){
-                    make_environment();
-                    object anonymous_function = make_compound(car(cdr(lambda_input)), cdr(cdr(lambda_input)), current_environment);
+                    object new_environment = make_pair();
+                    new_environment = make_environment(new_environment);
+                    object anonymous_function = make_compound(car(cdr(lambda_input)), cdr(cdr(lambda_input)), new_environment);
                     if(anonymous_function){
                       if(bind_compound_arguments(anonymous_function, lambda_arguments)){
-                        return sequential_eval( anonymous_function->this.compound.body, current_environment );
+                        return sequential_eval( anonymous_function->this.compound.body, anonymous_function->this.compound.environment );
                       }
                     }
                   }
@@ -57,9 +58,10 @@ object sfs_eval( object input, object target_environment ) {
             /* Implementing lambda forme evaluation. */
             if( is_lambda(caar(input)) ){
               DEBUG_MSG("; \" lambda \" forme detected");
-              make_environment();
+              object new_environment = make_pair();
+              new_environment = make_environment(new_environment);
               object lambda_input = cdr(input);
-              object anonymous_function = make_compound(car(lambda_input), cdr(cdr(lambda_input)), current_environment);
+              object anonymous_function = make_compound(car(lambda_input), cdr(cdr(lambda_input)), new_environment);
               if(anonymous_function){
                 return anonymous_function;
               }

@@ -68,14 +68,18 @@ object search_symbol_in_environment(string symbol, object target_environment){
   return NULL;
   */
 }
-
-void make_environment ( void ){
-  object new_environment = make_pair();
+object make_environment (object new_environment){
   new_environment->this.pair.car = make_pair();
   new_environment->this.pair.car = NULL;
   new_environment->this.pair.cdr = top_level_environment;  /* Insert in the beginning of the environment list*/
   /*  new_environment->this.pair.cdr = top_level_environment; -- Insert in the end of the environment list*/
-  current_environment = new_environment;
+  if(current_environment == top_level_environment){
+    current_environment = new_environment;
+  }
+  else{
+    current_environment->this.pair.cdr = new_environment;
+  }
+  return new_environment;
 }
 
 void initialize_formes(void){
