@@ -15,6 +15,10 @@
 #include "mem.h"
 
 object sfs_eval( object input, object target_environment ) {
+  /*  printf("\nPrinting target_environment---------------------------------\n");
+    sfs_print( target_environment );
+    printf("\n--------------------------------------------------------------\n");
+  */
     eval:
     if(input){
       /* Implementing auto-evaluation */
@@ -36,12 +40,16 @@ object sfs_eval( object input, object target_environment ) {
                   input->this.pair.car = sequential_eval(begin_input_arguments, target_environment);
                 }
                 if(is_lambda(car(caar(input)))){
-                  DEBUG_MSG("; \" lambda \" forme detected");
+                  DEBUG_MSG("; \" lambda \" forme with arguments detected");
                   object lambda_input = car(input);
                   object lambda_arguments = cdr(input);
+
                   if(car(cdr(lambda_input)) != nil){
                     object new_environment = make_pair();
-                    new_environment = make_environment(new_environment);
+                    new_environment->this.pair.car = make_pair();
+                    /*object new_environment1 = make_pair();*/
+                    new_environment = make_environment(new_environment, target_environment);
+
                     object anonymous_function = make_compound(car(cdr(lambda_input)), cdr(cdr(lambda_input)), new_environment);
                     if(anonymous_function){
                       if(bind_compound_arguments(anonymous_function, lambda_arguments)){
@@ -59,11 +67,15 @@ object sfs_eval( object input, object target_environment ) {
             if( is_lambda(caar(input)) ){
               DEBUG_MSG("; \" lambda \" forme detected");
               object new_environment = make_pair();
-              new_environment = make_environment(new_environment);
+              new_environment = make_environment(new_environment, target_environment);
               object lambda_input = cdr(input);
               object anonymous_function = make_compound(car(lambda_input), cdr(cdr(lambda_input)), new_environment);
               if(anonymous_function){
-                return anonymous_function;
+/*
+                sfs_print(target_environment);
+  */              return sequential_eval( anonymous_function->this.compound.body, anonymous_function->this.compound.environment );
+
+            /*   return anonymous_function; */
               }
               else{
                 WARNING_MSG("; ERROR: lambda: ill-formed expression");
@@ -92,7 +104,91 @@ object sfs_eval( object input, object target_environment ) {
 
             /* Implementing define forme evaluation. */
             else if(is_define(caar(input))){
-              if(cdr(cdr(cdr(input))) == nil){
+              object function = make_pair();
+              function->this.pair.car = NULL;
+              object new_environment = make_pair();
+              object parameters = NULL;
+              object body = NULL;
+              object function_symbol = NULL;
+
+              if(is_lambda(car(caar(cdr(cdr(input)))))){
+                DEBUG_MSG("; \" define function\" forme detected");
+                parameters = car(cdr(car(cdr(cdr(input)))));
+                body = cdr(cdr(car(cdr(cdr(input)))));
+                function_symbol = car(car(cdr(input)));
+                new_environment = make_environment(new_environment, target_environment);
+                function = define_function(function, function_symbol, parameters, body, target_environment, new_environment);
+                if(function){
+                  DEBUG_MSG("; \" define function\" returning compound");
+                  return car(car(function));
+                }
+                DEBUG_MSG("; ERROR: define: ill-formed expression");
+                return NULL;
+              }
+
+            else if(is_lambda(caar(caar(cdr(cdr(input)))))){
+              DEBUG_MSG("; \" define function\" with binded variables forme detected");
+              new_environment = make_environment(new_environment, target_environment);
+
+              object lambda_input = caar(cdr(cdr(input)));
+              object lambda_arguments = cdr(car(cdr(cdr(input))));
+/*
+              printf("----------------- arguments\n");
+              sfs_print(lambda_arguments);
+              printf("-----------------  \n");
+*/
+              parameters = car(cdr(lambda_input));
+/*
+              printf("----------------- parameters\n");
+              sfs_print(parameters);
+              printf("-----------------  \n");
+*/
+              body = cdr(cdr(lambda_input));
+/*
+              printf("----------------- body\n");
+              sfs_print(body);
+              printf("-----------------  \n");
+*/
+
+              function_symbol = car(car(cdr(input)));
+              function = define_function(function, function_symbol, parameters, body, target_environment, new_environment);
+              if(function){
+                if(bind_compound_arguments(function->this.pair.car->this.pair.cdr, lambda_arguments)){
+/*
+                  printf("----------------- compound envi\n");
+                  sfs_print(function->this.pair.car->this.pair.cdr->this.compound.environment);
+                  printf("-----------------  \n");
+*/
+                  DEBUG_MSG("; \" define function\" returning compound");
+                  return car(car(function));
+
+                }
+
+              }
+              DEBUG_MSG("; ERROR: define: ill-formed expression");
+              return NULL;
+
+
+
+            }
+
+            else if(car(cdr(input))->type == SFS_PAIR && caar(cdr(input))->type == SFS_PAIR){
+              DEBUG_MSG("; Implicit \" define function\" forme detected");
+              parameters = cdr(car(cdr(input)));
+              body = cdr(cdr(input));
+              function_symbol = caar(car(cdr(input)));
+              new_environment = make_environment(new_environment, target_environment);
+
+              function = define_function(function, function_symbol, parameters, body, target_environment, new_environment);
+              if(function){
+                DEBUG_MSG("; \" define function\" returning compound");
+                return car(car(function));
+              }
+              DEBUG_MSG("; ERROR: define: ill-formed expression");
+              return NULL;
+            }
+
+              else if(cdr(cdr(cdr(input))) == nil){
 
                 DEBUG_MSG("; \" define \" forme detected");
                 object symbol = make_pair();
@@ -243,8 +339,29 @@ object sfs_eval( object input, object target_environment ) {
               return primitive_function(reverse_arguments);
             }
 
+            else if(is_compound(car(input))){
+              DEBUG_MSG("; compound \" %s \" detected", caar(input)->this.symbol);
+
+              object function = cdr(car(input));
+              object arguments = cdr(input);
+/*
+              sfs_print(function->this.compound.body);
+
+*/
+              if(bind_compound_arguments(function, arguments)){
+                DEBUG_MSG("; Compound binded ..");
+                return sequential_eval( function->this.compound.body, function->this.compound.environment );
+              }
+              else{
+                DEBUG_MSG(";ERROR: binding compound");
+                return NULL;
+              }
+
+            }
+
             /* Implementing symbol evaluation. */
             else if(car(input)->type == SFS_SYMBOL){
+
 
               if(is_primitive(input)){
                  return input;
@@ -254,9 +371,9 @@ object sfs_eval( object input, object target_environment ) {
                 if(target_environment == top_level_environment){
                   DEBUG_MSG("Searching in top_level_environment..");
                 }
-                if(target_environment == current_environment){
+              /*  if(target_environment == current_environment){
                   DEBUG_MSG("Searching in current_environment..");
-                }
+                }*/
 
                 symbol = search_symbol_in_environment( car(input)->this.symbol, target_environment );
                 if(cdr(car(symbol)) != NULL ){
@@ -314,6 +431,15 @@ int is_lambda( object object ){
 int is_begin( object object ){
   if(object){
     if ( !strcmp(object->this.symbol, "begin" ) ){
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+int is_compound( object object ){
+  if(cdr(object)){
+    if(cdr(object)->type == SFS_COMPOUND){
       return TRUE;
     }
   }

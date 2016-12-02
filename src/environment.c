@@ -20,6 +20,7 @@ void make_top_level_environment( void ){
 }
 
 object insert_symbol_in_environment(object symbol_pair, object target_environment){
+
   object new_symbol_index = make_pair();
   new_symbol_index->this.pair.car = make_pair();
   new_symbol_index->this.pair.car = NULL;
@@ -40,6 +41,7 @@ object insert_symbol_in_environment(object symbol_pair, object target_environmen
 object search_symbol_in_environment(string symbol, object target_environment){
   object symbol_index = NULL;
   object environments = target_environment;
+
 
   while(environments != nil){
 
@@ -68,16 +70,20 @@ object search_symbol_in_environment(string symbol, object target_environment){
   return NULL;
   */
 }
-object make_environment (object new_environment){
+object make_environment (object new_environment, object target_environment){
   new_environment->this.pair.car = make_pair();
-  new_environment->this.pair.car = NULL;
-  new_environment->this.pair.cdr = top_level_environment;  /* Insert in the beginning of the environment list*/
+  new_environment->this.pair.car = nil;
+  new_environment->this.pair.cdr = target_environment;  /* Insert in the beginning of the environment list*/
   /*  new_environment->this.pair.cdr = top_level_environment; -- Insert in the end of the environment list*/
-  if(current_environment == top_level_environment){
+  /*if(current_environment == top_level_environment){
     current_environment = new_environment;
   }
   else{
     current_environment->this.pair.cdr = new_environment;
+  }*/
+  if(target_environment != top_level_environment){
+    /*target_environment->this.pair.cdr = new_environment;*/
+    target_environment = new_environment;
   }
   return new_environment;
 }
@@ -85,9 +91,7 @@ object make_environment (object new_environment){
 void initialize_formes(void){
   DEBUG_MSG("; Initializing formes in the top level environment..");
   int i;
-  object symbol_name = make_object(SFS_SYMBOL);
-  object symbol_pair = make_pair();
-  symbol_pair->this.pair.car = make_object(SFS_SYMBOL);
+
 
   const char *formes[] = {
     "quote",
@@ -98,6 +102,9 @@ void initialize_formes(void){
     "or"
   };
   for(i=0 ; i < 6 ; i++){
+    object symbol_name = make_object(SFS_SYMBOL);
+    object symbol_pair = make_pair();
+    symbol_pair->this.pair.car = make_object(SFS_SYMBOL);
     strcpy( symbol_name->this.symbol, formes[i] );
     symbol_pair->this.pair.car = symbol_name;
     insert_symbol_in_environment(symbol_pair, top_level_environment);

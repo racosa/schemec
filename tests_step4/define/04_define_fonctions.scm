@@ -2,7 +2,7 @@
 ; TEST_COMMENT= Test define reload
 
 (define (mult_2 y) (* 2 y))
-(fois_2 (fois_2 5))
+(mult_2 (mult_2 5))
 ;count
 (define count ((lambda (total) (lambda (incr) (set! total (+ total incr)) total)) 0))
 (count 1)

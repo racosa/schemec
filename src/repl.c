@@ -30,7 +30,7 @@ void usage_error( char *command ) {
 }
 
 object top_level_environment;
-object current_environment;
+/*object current_environment;*/
 object nil;
 object true;
 object false;
@@ -41,11 +41,10 @@ void init_interpreter ( void ) {
     true  = make_boolean();
     false = make_boolean();
     make_top_level_environment();
-    current_environment = top_level_environment;
+  /*  current_environment = top_level_environment;*/
 
     initialize_formes();
     initialize_primitives();
-
 }
 
 int main ( int argc, char *argv[] ) {

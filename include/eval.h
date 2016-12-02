@@ -31,6 +31,7 @@ int is_or( object object );
 int is_primitive( object object );
 int is_begin( object object );
 int is_lambda( object object );
+int is_compound( object object );
 
 #ifdef __cplusplus
 }

@@ -19,7 +19,8 @@ extern "C" {
 
 int bind_compound_arguments (object anonymous_function, object arguments);
 object eval_argument_list(object values, object environment);
-
+object define_function(object function, object function_symbol, object parameters, object body,
+  object target_environment, object new_environment);
 
 #ifdef __cplusplus
 }
