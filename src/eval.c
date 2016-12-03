@@ -15,10 +15,6 @@
 #include "mem.h"
 
 object sfs_eval( object input, object target_environment ) {
-  /*  printf("\nPrinting target_environment---------------------------------\n");
-    sfs_print( target_environment );
-    printf("\n--------------------------------------------------------------\n");
-  */
   eval:
     if(input){
       /* Implementing auto-evaluation */
@@ -74,6 +70,133 @@ object sfs_eval( object input, object target_environment ) {
               }
             }
 
+            /* Implementing let forme evaluation. */
+            if( is_let(caar(input)) ){
+              DEBUG_MSG("; \" let \" forme detected");
+              object bindings = car(cdr(input));
+              object body = cdr(cdr(input));
+              if(bindings->type != SFS_PAIR || (car(body)->type != SFS_PAIR && car(body)->type != SFS_NIL)){
+                WARNING_MSG("; ERROR: let: ill-formed expression");
+                return NULL;
+              }
+              else{
+                object extended_environment = make_pair();
+                extended_environment = make_environment(extended_environment, target_environment);
+                /* Multiple bindings case */
+                if(bindings->type == SFS_PAIR && car(bindings)->type == SFS_PAIR && caar(bindings)->type == SFS_PAIR ){
+                  while(bindings != nil){
+                    object variable = cons(caar(bindings), nil);
+                    object anonymous_function = make_compound(variable, body, extended_environment);
+                    if(anonymous_function){
+                      if(cdr(cdr(car(bindings))) != nil){
+                        WARNING_MSG("; ERROR: invalid init in let forme expression");
+                        return NULL;
+                      }
+                      else{
+                        object init = car(cdr(car(bindings)));
+                        init = sfs_eval(init, target_environment);
+                        init = cons( init , nil);
+                        bind_compound_arguments(anonymous_function, init, extended_environment, FALSE);
+                      }
+                    }
+                    else{
+                      WARNING_MSG("; ERROR: invalid variables in let forme expression");
+                      return NULL;
+                    }
+                    bindings = cdr(bindings);
+                  }
+                }
+                /* Single binding case */
+                else if(bindings->type == SFS_PAIR && car(bindings)->type == SFS_PAIR && caar(bindings)->type == SFS_SYMBOL ){
+                  object variable = cons(car(bindings), nil);
+                  object anonymous_function = make_compound(variable, body, extended_environment);
+                  if(anonymous_function){
+                    if(cdr(cdr(bindings)) != nil){
+                      WARNING_MSG("; ERROR: invalid init in let forme expression");
+                      return NULL;
+                    }
+                    else{
+                      object init = car(cdr(bindings));
+                      init = sfs_eval(init, target_environment);
+                      init = cons(init , nil);
+                      bind_compound_arguments(anonymous_function, init, extended_environment, FALSE);
+                    }
+                  }
+                  else{
+                    WARNING_MSG("; ERROR: invalid variables in let forme expression");
+                    return NULL;
+                  }
+
+                }
+                return sequential_eval(body, extended_environment);
+              }
+            }
+
+            /* Implementing let* forme evaluation. */
+            if( is_let_asterisc(caar(input)) ){
+              DEBUG_MSG("; \" let* \" forme detected");
+              object bindings = car(cdr(input));
+              object body = cdr(cdr(input));
+
+              if(bindings->type != SFS_PAIR || (car(body)->type != SFS_PAIR && car(body)->type != SFS_NIL)){
+                WARNING_MSG("; ERROR: let*: ill-formed expression");
+                return NULL;
+
+              }
+              else{
+                object extended_environment = make_pair();
+                extended_environment = make_environment(extended_environment, target_environment);
+                /* Multiple bindings case */
+                if(bindings->type == SFS_PAIR && car(bindings)->type == SFS_PAIR && caar(bindings)->type == SFS_PAIR ){
+                  while(bindings != nil){
+                    object variable = cons(caar(bindings), nil);
+                    object anonymous_function = make_compound(variable, body, extended_environment);
+                    if(anonymous_function){
+                      if(cdr(cdr(car(bindings))) != nil){
+                        WARNING_MSG("; ERROR: invalid init in let* forme expression");
+                        return NULL;
+                      }
+                      else{
+                        object init = car(cdr(car(bindings)));
+                        init = sfs_eval(init, target_environment);
+                        init = cons( init , nil);
+                        bind_compound_arguments(anonymous_function, init, extended_environment, FALSE);
+                        target_environment = extended_environment;
+                      }
+                    }
+                    else{
+                      WARNING_MSG("; ERROR: invalid variables in let* forme expression");
+                      return NULL;
+                    }
+                    bindings = cdr(bindings);
+                  }
+                }
+                /* Single binding case */
+                else if(bindings->type == SFS_PAIR && car(bindings)->type == SFS_PAIR && caar(bindings)->type == SFS_SYMBOL ){
+                  object variable = cons(car(bindings), nil);
+                  object anonymous_function = make_compound(variable, body, extended_environment);
+                  if(anonymous_function){
+                    if(cdr(cdr(bindings)) != nil){
+                      WARNING_MSG("; ERROR: invalid init in let* forme expression");
+                      return NULL;
+                    }
+                    else{
+                      object init = car(cdr(bindings));
+                      init = sfs_eval(init, target_environment);
+                      init = cons(init , nil);
+                      bind_compound_arguments(anonymous_function, init, extended_environment, FALSE);
+                      target_environment = extended_environment;
+                    }
+                  }
+                  else{
+                    WARNING_MSG("; ERROR: invalid variables in let* forme expression");
+                    return NULL;
+                  }
+                }
+                return sequential_eval(body, extended_environment);
+              }
+            }
+
             /* Implementing begin forme evaluation. */
             if( is_begin(caar(input)) ){
               DEBUG_MSG("; \" begin \" forme detected");
@@ -113,7 +236,7 @@ object sfs_eval( object input, object target_environment ) {
                   DEBUG_MSG("; \" define function\" returning compound");
                   return car(car(function));
                 }
-                DEBUG_MSG("; ERROR: define: ill-formed expression");
+                WARNING_MSG("; ERROR: define: ill-formed expression");
                 return NULL;
               }
 
@@ -143,10 +266,9 @@ object sfs_eval( object input, object target_environment ) {
                   DEBUG_MSG("; \" define function\" returning compound");
                   return car(car(function));
               }
-              DEBUG_MSG("; ERROR: define: ill-formed expression");
+              WARNING_MSG("; ERROR: define: ill-formed expression");
               return NULL;
             }
-
 
             else if(car(cdr(input))->type == SFS_PAIR && caar(cdr(input))->type == SFS_PAIR){
               DEBUG_MSG("; Implicit \" define function\" forme detected");
@@ -160,7 +282,7 @@ object sfs_eval( object input, object target_environment ) {
                 DEBUG_MSG("; \" define function\" returning compound");
                 return car(car(function));
               }
-              DEBUG_MSG("; ERROR: define: ill-formed expression");
+              WARNING_MSG("; ERROR: define: ill-formed expression");
               return NULL;
             }
 
@@ -172,29 +294,14 @@ object sfs_eval( object input, object target_environment ) {
                 symbol->this.pair.car = NULL;
 
                 symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol, target_environment, FALSE );
-                if(cdr(car(symbol)) != nil ){
-                  symbol_value = sfs_eval(car(cdr(cdr(input))), target_environment);
-                  if(symbol_value) {
+                symbol_value = sfs_eval(car(cdr(cdr(input))), target_environment);
+                if(symbol_value){
                     symbol->this.pair.car->this.pair.cdr = symbol_value;
                     return car(car(symbol));
                   }
-                  else{
+                else{
                     return NULL;
-                  }
-
-                 }
-                 else{
-                  symbol_value = sfs_eval(car(cdr(cdr(input))), target_environment);
-                  if(symbol_value){
-                    symbol->this.pair.car->this.pair.cdr = symbol_value;
-                    return car(car(symbol));
-                  }
-                  else{
-                    return NULL;
-                  }
-
-                 }
-
+                }
               }
               else {
                 WARNING_MSG("; ERROR: define: missing or extra arguments");
@@ -327,17 +434,17 @@ object sfs_eval( object input, object target_environment ) {
               if(function->this.compound.environment != top_level_environment){
                 target_environment = function->this.compound.environment;
               }
-              object new_environment = make_pair();
-              new_environment = make_environment(new_environment, target_environment);
+              object extended_environment = make_pair();
+              extended_environment = make_environment(extended_environment, target_environment);
 
-              if(bind_compound_arguments(function, arguments, new_environment, FALSE)){
+              if(bind_compound_arguments(function, arguments, extended_environment, FALSE)){
                 DEBUG_MSG("; Extended environment updated successfully..");
 /*
                 printf("\n---------------------- printing updated environment\n");
                 sfs_print(new_environment);
                 printf("\n---------------------- printing updated environment\n");
 */
-                return sequential_eval( function->this.compound.body, new_environment );
+                return sequential_eval( function->this.compound.body, extended_environment );
               }
               else{
                 DEBUG_MSG(";ERROR: failed to update environment");
@@ -395,102 +502,4 @@ object sequential_eval(object arguments, object target_environment){
     }
   }
   return result;
-}
-
-int is_lambda( object object ){
-  if(object){
-    if ( !strcmp(object->this.symbol, "lambda" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_begin( object object ){
-  if(object){
-    if ( !strcmp(object->this.symbol, "begin" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_compound( object object ){
-  if(cdr(object)){
-    if(cdr(object)->type == SFS_COMPOUND){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_primitive( object object ){
-  if(cdr(object)){
-    if(cdr(object)->type == SFS_PRIMITIVE){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_quote( object object ){
-  if(object){
-    if ( !strcmp( object->this.symbol, "quote" ) || !strcmp( object->this.symbol, "\'" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_define( object object ){
-  if(object){
-    if ( !strcmp(object->this.symbol, "define" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_set( object object ){
-  if(object){
-    if ( !strcmp(object->this.symbol, "set!" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_if( object object ){
-  if(object){
-    if ( !strcmp(object->this.symbol, "if" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_and( object object ){
-  if(object){
-    if ( !strcmp(object->this.symbol, "and" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_or( object object ){
-  if(object){
-    if ( !strcmp(object->this.symbol, "or" ) ){
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
-int is_forme(object symbol){
-    if(is_quote(symbol) || is_define(symbol) || is_set(symbol)
-       || is_if(symbol) || is_and(symbol) || is_or(symbol) || is_begin(symbol)){
-      return TRUE;
-    }
-    return FALSE;
 }

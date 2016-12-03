@@ -18,6 +18,7 @@ extern "C" {
 #include "object.h"
 #include "environment.h"
 
+void initialize_primitives( void );
 void initialize_primitive (string symbol, primitive function);
 
 object is_null_primitive(object arguments);
@@ -27,6 +28,7 @@ object is_integer_primitive(object arguments);
 object is_char_primitive(object arguments);
 object is_string_primitive(object arguments);
 object is_pair_primitive(object arguments);
+object is_procedure_primitive(object arguments);
 
 object char_to_integer_primitive(object arguments);
 object integer_to_char_primitive(object arguments);

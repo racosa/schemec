@@ -17,21 +17,12 @@ extern "C" {
 
 
 #include "object.h"
+#include "forme.h"
 #include "primitive.h"
 
 object sfs_eval( object input, object target_environment );
 object sequential_eval(object arguments, object target_environment);
-int is_forme(object symbol);
-int is_quote(object object);
-int is_define( object object );
-int is_set( object object );
-int is_if( object object );
-int is_and( object object );
-int is_or( object object );
-int is_primitive( object object );
-int is_begin( object object );
-int is_lambda( object object );
-int is_compound( object object );
+
 
 #ifdef __cplusplus
 }
