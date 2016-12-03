@@ -19,7 +19,7 @@ object sfs_eval( object input, object target_environment ) {
     sfs_print( target_environment );
     printf("\n--------------------------------------------------------------\n");
   */
-    eval:
+  eval:
     if(input){
       /* Implementing auto-evaluation */
       if(input->type == SFS_NUMBER || input->type == SFS_CHARACTER
@@ -43,16 +43,13 @@ object sfs_eval( object input, object target_environment ) {
                   DEBUG_MSG("; \" lambda \" forme with arguments detected");
                   object lambda_input = car(input);
                   object lambda_arguments = cdr(input);
-
                   if(car(cdr(lambda_input)) != nil){
                     object new_environment = make_pair();
                     new_environment->this.pair.car = make_pair();
-                    /*object new_environment1 = make_pair();*/
                     new_environment = make_environment(new_environment, target_environment);
-
                     object anonymous_function = make_compound(car(cdr(lambda_input)), cdr(cdr(lambda_input)), new_environment);
                     if(anonymous_function){
-                      if(bind_compound_arguments(anonymous_function, lambda_arguments)){
+                      if(bind_compound_arguments(anonymous_function, lambda_arguments, anonymous_function->this.compound.environment, FALSE)){
                         return sequential_eval( anonymous_function->this.compound.body, anonymous_function->this.compound.environment );
                       }
                     }
@@ -66,16 +63,10 @@ object sfs_eval( object input, object target_environment ) {
             /* Implementing lambda forme evaluation. */
             if( is_lambda(caar(input)) ){
               DEBUG_MSG("; \" lambda \" forme detected");
-              object new_environment = make_pair();
-              new_environment = make_environment(new_environment, target_environment);
               object lambda_input = cdr(input);
-              object anonymous_function = make_compound(car(lambda_input), cdr(cdr(lambda_input)), new_environment);
+              object anonymous_function = make_compound(car(lambda_input), cdr(cdr(lambda_input)), target_environment);
               if(anonymous_function){
-/*
-                sfs_print(target_environment);
-  */              return sequential_eval( anonymous_function->this.compound.body, anonymous_function->this.compound.environment );
-
-            /*   return anonymous_function; */
+                return anonymous_function;
               }
               else{
                 WARNING_MSG("; ERROR: lambda: ill-formed expression");
@@ -87,6 +78,7 @@ object sfs_eval( object input, object target_environment ) {
             if( is_begin(caar(input)) ){
               DEBUG_MSG("; \" begin \" forme detected");
               object begin_arguments = cdr(input);
+
               return sequential_eval(begin_arguments, target_environment);
             }
 
@@ -116,8 +108,7 @@ object sfs_eval( object input, object target_environment ) {
                 parameters = car(cdr(car(cdr(cdr(input)))));
                 body = cdr(cdr(car(cdr(cdr(input)))));
                 function_symbol = car(car(cdr(input)));
-                new_environment = make_environment(new_environment, target_environment);
-                function = define_function(function, function_symbol, parameters, body, target_environment, new_environment);
+                function = define_function(function, function_symbol, parameters, body, target_environment, target_environment);
                 if(function){
                   DEBUG_MSG("; \" define function\" returning compound");
                   return car(car(function));
@@ -128,49 +119,34 @@ object sfs_eval( object input, object target_environment ) {
 
             else if(is_lambda(caar(caar(cdr(cdr(input)))))){
               DEBUG_MSG("; \" define function\" with binded variables forme detected");
-              new_environment = make_environment(new_environment, target_environment);
-
+              object new_binded_environment = make_pair();
+              new_binded_environment = make_environment(new_binded_environment, target_environment);
               object lambda_input = caar(cdr(cdr(input)));
               object lambda_arguments = cdr(car(cdr(cdr(input))));
-/*
-              printf("----------------- arguments\n");
-              sfs_print(lambda_arguments);
-              printf("-----------------  \n");
-*/
-              parameters = car(cdr(lambda_input));
-/*
-              printf("----------------- parameters\n");
-              sfs_print(parameters);
-              printf("-----------------  \n");
-*/
-              body = cdr(cdr(lambda_input));
-/*
-              printf("----------------- body\n");
-              sfs_print(body);
-              printf("-----------------  \n");
-*/
+              object binded_parameters = car(cdr(lambda_input));
+
+              object anonymous_dummy_function = make_compound(binded_parameters, nil, new_binded_environment);
+
+              bind_compound_arguments(anonymous_dummy_function, lambda_arguments,
+                                      anonymous_dummy_function->this.compound.environment, FALSE);
+
+              target_environment = new_binded_environment;
+
+              new_environment = make_environment(new_environment, target_environment);
+              parameters = car(cdr(car(cdr(cdr(lambda_input)))));
+              body = cdr(cdr(car(cdr(cdr(lambda_input)))));
 
               function_symbol = car(car(cdr(input)));
               function = define_function(function, function_symbol, parameters, body, target_environment, new_environment);
+
               if(function){
-                if(bind_compound_arguments(function->this.pair.car->this.pair.cdr, lambda_arguments)){
-/*
-                  printf("----------------- compound envi\n");
-                  sfs_print(function->this.pair.car->this.pair.cdr->this.compound.environment);
-                  printf("-----------------  \n");
-*/
                   DEBUG_MSG("; \" define function\" returning compound");
                   return car(car(function));
-
-                }
-
               }
               DEBUG_MSG("; ERROR: define: ill-formed expression");
               return NULL;
-
-
-
             }
+
 
             else if(car(cdr(input))->type == SFS_PAIR && caar(cdr(input))->type == SFS_PAIR){
               DEBUG_MSG("; Implicit \" define function\" forme detected");
@@ -179,7 +155,7 @@ object sfs_eval( object input, object target_environment ) {
               function_symbol = caar(car(cdr(input)));
               new_environment = make_environment(new_environment, target_environment);
 
-              function = define_function(function, function_symbol, parameters, body, target_environment, new_environment);
+              function = define_function(function, function_symbol, parameters, body, target_environment, target_environment);
               if(function){
                 DEBUG_MSG("; \" define function\" returning compound");
                 return car(car(function));
@@ -195,7 +171,7 @@ object sfs_eval( object input, object target_environment ) {
                 object symbol_value = sfs_malloc(sizeof(*symbol_value));
                 symbol->this.pair.car = NULL;
 
-                symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol, target_environment );
+                symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol, target_environment, FALSE );
                 if(cdr(car(symbol)) != nil ){
                   symbol_value = sfs_eval(car(cdr(cdr(input))), target_environment);
                   if(symbol_value) {
@@ -232,7 +208,7 @@ object sfs_eval( object input, object target_environment ) {
                 DEBUG_MSG("; \" set! \" forme detected");
                 object symbol = make_pair();
                 symbol->this.pair.car = NULL;
-                symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol, target_environment );
+                symbol = search_symbol_in_environment( car(car(cdr(input)))->this.symbol, target_environment, TRUE );
 
                 if(cdr(car(symbol)) != NULL){
                   object old_symbol_value = make_object(cdr(car(symbol))->type);
@@ -262,12 +238,16 @@ object sfs_eval( object input, object target_environment ) {
                 if(predicate){
                   if(predicate != false){
                     DEBUG_MSG("; (predicate) is (true), evaluating (consequence)");
-                    input = car(cdr(cdr(input)));
+                    /*input = car(cdr(cdr(input)));*/
+                    /*enabling multiple line body in if statements*/
+                    input = cons(car(cdr(cdr(input))), nil);
+                    return sequential_eval(input, target_environment);
                   }
                   else{
                     DEBUG_MSG("; (predicate) is (false), evaluating (alternative)");
-                    input = car(cdr(cdr(cdr(input))));
-
+                    /*input = car(cdr(cdr(cdr(input))));*/
+                    /*enabling multiple line body in if statements*/
+                    return sequential_eval(cdr(cdr(cdr(input))) , target_environment);
                   }
                   /*Goto begin of eval function*/
                   goto eval;
@@ -340,20 +320,27 @@ object sfs_eval( object input, object target_environment ) {
             }
 
             else if(is_compound(car(input))){
-              DEBUG_MSG("; compound \" %s \" detected", caar(input)->this.symbol);
 
               object function = cdr(car(input));
               object arguments = cdr(input);
-/*
-              sfs_print(function->this.compound.body);
+              /* Fixing case for binded environment in initialization*/
+              if(function->this.compound.environment != top_level_environment){
+                target_environment = function->this.compound.environment;
+              }
+              object new_environment = make_pair();
+              new_environment = make_environment(new_environment, target_environment);
 
+              if(bind_compound_arguments(function, arguments, new_environment, FALSE)){
+                DEBUG_MSG("; Extended environment updated successfully..");
+/*
+                printf("\n---------------------- printing updated environment\n");
+                sfs_print(new_environment);
+                printf("\n---------------------- printing updated environment\n");
 */
-              if(bind_compound_arguments(function, arguments)){
-                DEBUG_MSG("; Compound binded ..");
-                return sequential_eval( function->this.compound.body, function->this.compound.environment );
+                return sequential_eval( function->this.compound.body, new_environment );
               }
               else{
-                DEBUG_MSG(";ERROR: binding compound");
+                DEBUG_MSG(";ERROR: failed to update environment");
                 return NULL;
               }
 
@@ -362,22 +349,13 @@ object sfs_eval( object input, object target_environment ) {
             /* Implementing symbol evaluation. */
             else if(car(input)->type == SFS_SYMBOL){
 
-
               if(is_primitive(input)){
                  return input;
               }
               else{
                 object symbol;
-                if(target_environment == top_level_environment){
-                  DEBUG_MSG("Searching in top_level_environment..");
-                }
-              /*  if(target_environment == current_environment){
-                  DEBUG_MSG("Searching in current_environment..");
-                }*/
-
-                symbol = search_symbol_in_environment( car(input)->this.symbol, target_environment );
+                symbol = search_symbol_in_environment( car(input)->this.symbol, target_environment, TRUE );
                 if(cdr(car(symbol)) != NULL ){
-                  /*DEBUG_MSG("; Variable found in top level environment");*/
                   return cdr(car(symbol));
                 }
                 WARNING_MSG("; ERROR: unbound variable: %s", car(car(symbol))->this.symbol );
@@ -400,7 +378,7 @@ object sfs_eval( object input, object target_environment ) {
         }
     }
     else{
-      DEBUG_MSG("exception returning NULL");
+      DEBUG_MSG("; ERROR: evaluation exception");
       return NULL;
     }
 }

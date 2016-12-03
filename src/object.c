@@ -88,7 +88,7 @@ object make_symbol ( string symbol, object target_environment ){
     symbol_index->this.pair.car = symbol_pair;
 
     if(car(top_level_environment) != NULL){
-      symbol_index = search_symbol_in_environment( symbol, target_environment );
+      symbol_index = search_symbol_in_environment( symbol, target_environment, FALSE );
       if (symbol_index){
         return car(symbol_index);
       }

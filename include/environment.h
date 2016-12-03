@@ -21,7 +21,7 @@ extern object top_level_environment;
 */
 void make_top_level_environment( void );
 object insert_symbol_in_environment( object symbol_pair, object target_environment );
-object search_symbol_in_environment( string symbol, object target_environment );
+object search_symbol_in_environment( string symbol, object target_environment, int search_in_all_environments );
 object make_environment ( object new_environment, object target_environment );
 void initialize_formes( void );
 void initialize_primitives( void );
