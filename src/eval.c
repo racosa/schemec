@@ -70,6 +70,65 @@ object sfs_eval( object input, object target_environment ) {
               }
             }
 
+            /* Implementing map forme evaluation. */
+            if(is_map(caar(input))){
+              DEBUG_MSG("; \" map \" forme detected");
+              object eval_expression = make_pair();
+              object procedure = car(cdr(input));
+              object list_of_lists = cdr(cdr(input));
+              object list_of_lists_clone = list_of_lists;
+              object list = car(list_of_lists);
+              object list_clone = car(cdr(list));
+              object result_list = make_pair();
+              result_list = nil;
+              int size_of_list = 0;
+              int list_index = 0;
+              int index = 0;
+              /*One list case*/
+              if(cdr(cdr(cdr(input))) == nil){
+                list = sfs_eval(car(cdr(cdr(input))), target_environment);
+                while (list != nil) {
+                  eval_expression = make_pair();
+                  eval_expression = nil;
+                  eval_expression = cons(car(list), eval_expression);
+                  eval_expression = cons(procedure, eval_expression);
+                  result_list = cons(sfs_eval(eval_expression, target_environment), result_list);
+                  list = cdr(list);
+                  free(eval_expression);
+                }
+                return reverse_list(result_list);
+              }
+              /*More than one list case*/
+              else{
+                while(list_clone != nil){
+                  size_of_list++;
+                  list_clone = cdr(list_clone);
+                }
+                while(list_index < size_of_list){
+                  eval_expression = nil;
+                  while(list_of_lists != nil){
+                    list = sfs_eval(car(list_of_lists), target_environment);
+                    for(index = 0; index < list_index; index++){
+                      list = cdr(list);
+                    }
+                    object list_element = car(list);
+                    eval_expression = cons(list_element, eval_expression);
+                    list_of_lists = cdr(list_of_lists);
+                  }
+
+                  eval_expression = reverse_list(eval_expression);
+                  eval_expression = cons(procedure, eval_expression);
+                  result_list = cons(sfs_eval(eval_expression, target_environment), result_list);
+
+                  list_of_lists = list_of_lists_clone;
+                  free(eval_expression);
+                  list_index++;
+                }
+                return reverse_list(result_list);
+              }
+
+            }
+
             /* Implementing let forme evaluation. */
             if( is_let(caar(input)) ){
               DEBUG_MSG("; \" let \" forme detected");
@@ -471,9 +530,6 @@ object sfs_eval( object input, object target_environment ) {
             }
 
             else{
-              /*
-                return input;
-                */
                 WARNING_MSG("; ERROR: wrong type to apply");
                 return NULL;
               }

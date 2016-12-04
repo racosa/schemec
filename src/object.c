@@ -189,3 +189,13 @@ object cons(object car, object cdr){
   pair->this.pair.cdr = cdr;
   return pair;
 }
+
+object reverse_list (object list){
+  object reversed_list = make_pair();
+  reversed_list = nil;
+  while(list != nil){
+    reversed_list = cons(car(list), reversed_list);
+    list = cdr(list);
+  }
+  return reversed_list;
+}

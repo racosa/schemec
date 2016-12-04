@@ -67,6 +67,7 @@ object cons(object car, object cdr);
 object make_primitive (primitive function);
 object make_compound (object parameters, object body, object environment);
 int validate_parameters(object parameters);
+object reverse_list (object list);
 
 #define SFS_NUMBER       0x00
 #define SFS_CHARACTER    0x01
