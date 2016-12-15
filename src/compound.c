@@ -16,8 +16,11 @@ object define_function(object function, object function_symbol, object parameter
   object target_environment, object new_environment){
   function = search_symbol_in_environment (function_symbol->this.symbol, target_environment, TRUE);
   if(function){
-    function->this.pair.car->this.pair.cdr = make_compound(parameters, body, new_environment);
-    return function;
+    object compound = make_compound(parameters, body, new_environment);
+    if (compound){
+      function->this.pair.car->this.pair.cdr = compound;
+      return function;
+    }
   }
   return NULL;
 }
@@ -98,44 +101,4 @@ object eval_argument_list(object values, object environment){
     evaluated_values_list = cdr(evaluated_values_list);
   }
   return reverse_evaluated_values_list;
-}
-
-int update_function_environment(object function, object arguments){
-  object variables = function->this.compound.parameters;
-  object environment = function->this.compound.environment;
-  object values = arguments;
-  if(car(variables) != nil){
-
-    if(variables->type == SFS_PAIR && car(variables)->type == SFS_PAIR && caar(variables)->type == SFS_SYMBOL){
-      while (variables != nil) {
-        if(!strcmp(caar(variables)->this.symbol, ".") && cdr(cdr(variables)) == nil){
-          object symbol_index = search_symbol_in_environment(caar(cdr(variables))->this.symbol, environment, FALSE);
-          if(symbol_index){
-            symbol_index->this.pair.car->this.pair.cdr = eval_argument_list(values, environment);
-          }
-          variables = cdr(cdr(variables));
-          return TRUE;
-        }
-        else{
-          object symbol_index = search_symbol_in_environment(caar(variables)->this.symbol, environment, FALSE);
-          if(symbol_index){
-            symbol_index->this.pair.car->this.pair.cdr = sfs_eval(car(values), environment);
-          }
-          variables = cdr(variables);
-          values = cdr(values);
-        }
-      }
-      if(cdr(values)){
-        return FALSE;
-      }
-    }
-    else if(variables->type == SFS_PAIR && car(variables)->type == SFS_SYMBOL){
-      object symbol_index = search_symbol_in_environment(car(variables)->this.symbol, environment, FALSE);
-      if(symbol_index){
-        symbol_index->this.pair.car->this.pair.cdr = sfs_eval(car(values), environment);
-      }
-    }
-    return TRUE;
-  }
-  return FALSE;
 }

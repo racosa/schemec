@@ -125,6 +125,7 @@ object make_pair ( void ){
 
 int validate_parameters(object parameters){
   object variables = parameters;
+  object variables_list = parameters;
 
   if(variables == nil){
     return TRUE;
@@ -141,6 +142,20 @@ int validate_parameters(object parameters){
               return FALSE;
             }
           }
+          /* Fixing equal parameters detection */
+          while(variables_list != nil){
+            object target_variable = caar(variables_list);
+            object variables_list_clone = cdr(variables_list);
+            while(variables_list_clone != nil){
+              object variable_to_compare = caar(variables_list_clone);
+              if(!strcmp(target_variable->this.symbol, variable_to_compare->this.symbol)){
+                return FALSE;
+              }
+              variables_list_clone = cdr(variables_list_clone);
+            }
+            variables_list = cdr(variables_list);
+          }
+
           return TRUE;
         }
       }

@@ -41,8 +41,6 @@ void init_interpreter ( void ) {
     true  = make_boolean();
     false = make_boolean();
     make_top_level_environment();
-  /*  current_environment = top_level_environment;*/
-
     initialize_formes();
     initialize_primitives();
 }
