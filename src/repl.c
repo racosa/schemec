@@ -21,7 +21,7 @@
 #include "print.h"
 
 /* mode d'interaction avec l'interpreteur (exemple)*/
-typedef enum {INTERACTIF,SCRIPT} inter_mode;
+typedef enum {INTERACTIF,SCRIPT,LIB} inter_mode;
 
 
 void usage_error( char *command ) {
@@ -68,11 +68,12 @@ int main ( int argc, char *argv[] ) {
     /* La ligne suivante provoquerait l'affichage du message
        puis la sortie du programme avec un code erreur non nul (EXIT_FAILURE) */
     /* ERROR_MSG("Erreur. Arret du programme"); */
-
+/*
     if ( argc > 2 ) {
         usage_error( argv[0] );
         exit( EXIT_FAILURE );
     }
+    */
     if(argc == 2 && strcmp(argv[1], "-h") == 0) {
         usage_error( argv[0] );
         exit( EXIT_SUCCESS );
@@ -93,6 +94,15 @@ int main ( int argc, char *argv[] ) {
         mode = SCRIPT;
     }
 
+    if(argc == 3 && strcmp(argv[1], "-lib") == 0) {
+        INFO_MSG("------ Library detected: uploading lib functions: -----");
+        fp = fopen( argv[2], "r" );
+        if ( fp == NULL ) {
+            perror( "fopen" );
+            exit( EXIT_FAILURE );
+        }
+        mode = LIB;
+    }
 
     while ( 1 ) {
         input[0]='\0';
@@ -104,6 +114,17 @@ int main ( int argc, char *argv[] ) {
         Sexpr_err = sfs_get_sexpr( input, fp );
 
         if ( S_OK != Sexpr_err) {
+
+            if(mode == LIB){
+              fclose( fp );
+              if (Sexpr_err==S_END) {
+                  /* End of lib file */
+                  mode = INTERACTIF;
+                  fp = stdin;
+                  INFO_MSG("------------ Library uploaded successfully -----------");
+              }
+            }
+
             /* si fichier alors on sort*/
             if (mode == SCRIPT) {
                 fclose( fp );
