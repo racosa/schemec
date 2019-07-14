@@ -1,6 +1,6 @@
 /**
  * @file forme.c
- * @author Rafael Costa Sales
+ * @author Rafael Costa
  * @date Sat Dec 03 18:19:22 2016
  * @brief Forme functions for the schemeC interpreter.
  *

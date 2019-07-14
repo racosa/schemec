@@ -1,6 +1,6 @@
 /**
  * @file compound.c
- * @author Rafael Costa Sales
+ * @author Rafael Costa
  * @date Sun Nov 27 21:06:43 2016
  * @brief Compound functions for the schemeC interpreter.
  *

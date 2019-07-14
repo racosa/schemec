@@ -1,8 +1,7 @@
-
 /**
- * @file print.h
- * @author François Cayre <cayre@yiking.(null)>
- * @date Fri Jun 22 20:12:52 2012
+ * @file print.c
+ * @author Rafael Costa
+ * @date Sat Nov 12 00:00:00 2016
  * @brief Printing stuff for SFS.
  *
  * Printing stuff for SFS.

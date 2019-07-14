@@ -1,6 +1,6 @@
 /**
  * @file environment.h
- * @author Rafael Costa Sales
+ * @author Rafael Costa
  * @date Sat Oct 16 00:56:33 2016
  * @brief Environment definition for the schemeC interpreter.
  *

@@ -1,4 +1,3 @@
-
 /**
  * @file read.c
  * @author François Cayre <cayre@yiking.(null)>
@@ -30,12 +29,6 @@ void flip( uint *i ) {
     }
 }
 
-/*
- * @fn char* first_usefull_char(char* line)
- *
- * @brief retourne un pointeur sur le premier caractere utile dans line
- * ou NULL si line ne contient que des espaces et des commentaires
- */
 char* first_usefull_char(char* line) {
 
     int i=0;
@@ -43,66 +36,24 @@ char* first_usefull_char(char* line) {
         return NULL;
     }
     i = 0;
-    /* on saute les espaces */
     while(line[i] != '\0' && isspace(line[i])) {
         i++;
     }
-    /* si fin de ligne => ligne inutile */
     if(line[i] == '\0') {
         return NULL;
     }
-    /* si premier caractere non espace est ';' => ligne inutile */
     if(line[i] == ';') {
         return NULL;
     }
-    return line + i; /* ligne utile */
+    return line + i;
 }
 
-/**
- * @fn uint  sfs_get_sexpr( char *input, FILE *fp )
- *
- * @brief extrait la prochaine S-Expression dans le flux fp et la stocke dans input
- * (meme si elle est repartie sur plusieurs lignes)
- * @param fp (FILE *) flux d'entree (ouvert en ecriture, mode texte)
- * @param input (char *) chaine allouee de taille BIGSTRING, dans laquelle la S-Expression sera stockée
- *
- * @return S_OK si une S-Expression apparemment valide a ete trouvee
- * @return S_KO si on n'a pas trouve de S-Expression valide
- * @return S_END si fin de fichier atteinte sans avoir lu de caractere utile.
- *
- * sfs_get_sexpr commence par lire une ligne dans fp,
- * puis compte le nombre de parentheses ouvrantes et fermantes sur la ligne.
- * Les parentheses dans des chaines et les caracteres Scheme #\( et #\)
- * ne sont pas comptes.
- *
- * Si le compte devient zéro et que
- *        - la ligne est fini, la fonction retourne S_OK
- * 				- la ligne n'est pas fini la fonction retourne S_KO
- *
- * S'il y a plus de parentheses fermantes qu'ouvrantes,
- * la fonction retourne S_KO.
- * Les commentaires et espaces qui figurent a la fin de chaque ligne
- * sont remplacés par un espace.
- * Les espaces qui figurent a la fin de la S-Expression (y compris '\n')
- * sont supprimés.
- *
- * Attention : cette fonction refuse les S-Expression multiple sur une seule ligne. Ainsi :
- *    a b c
- *    (qqchose) (autrechose)
- *    (qqchose) 78
- * seront considereees comme des erreurs
- * et la fonction retournera S_KO
- *
- * @pre fp doit etre prealablement ouvert en lecture
- * @pre input doit etre prealablement alloue en memoire, de taille BIGSTRING
- */
-
 typedef enum {
-    NOTHING,        /* rien n'a ete trouve encore.. */
-    STRING_ATOME,   /* la premiere trouvee dans la ligne semble etre un atome */
-    BASIC_ATOME,    /* la premiere trouvee dans la ligne semble etre d'une chaine */
-    S_EXPR_PARENTHESIS, /* la premiere trouvee dans la ligne semble etre une expression parenthesee */
-    FINISHED        /* on a trouve une S-Expr bien formee */
+    NOTHING,
+    STRING_ATOME,
+    BASIC_ATOME,
+    S_EXPR_PARENTHESIS,
+    FINISHED
 } EXPRESSION_TYPE_T;
 
 uint  sfs_get_sexpr( char *input, FILE *fp ) {
@@ -124,38 +75,30 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
         ret = NULL;
         chunk = NULL;
 
-        /* si en mode interactif*/
         if ( stdin == fp ) {
             uint nspaces = 2*parlevel;
 
             init_string( sfs_prompt );
 
-            /* le prompt indique le niveau de parenthese
-               et decale la prochaine entrée en fonction
-               de ce niveau (un peu à la python)*/
             sprintf( sfs_prompt, "SFS:%u > ", parlevel );
 
             for ( i= 0; i< nspaces; i++ ) {
                 sfs_prompt[strlen(sfs_prompt)] = ' ';
             }
 
-            /* si sur plusieurs lignes, le \n équivaut à un espace*/
             if (nspaces>0) {
                 input[strlen(input)+1] = '\0';
                 input[strlen(input)] = ' ';
             }
 
-            /*saisie de la prochaine ligne à ajouter dans l'input*/
             chunk = readline( sfs_prompt );
         }
-        /*si en mode fichier*/
         else {
             chunk=k;
             memset( chunk, '\0', BIGSTRING );
             ret = fgets( chunk, BIGSTRING, fp );
 
-            if ( NULL == ret ) {
-                /* fin de fichier...*/
+            if ( NULL == ret ) {  
                 if ( parlevel != 0 ) {
                     WARNING_MSG( "Parse error: missing ')'" );
                     return S_KO;
@@ -171,8 +114,6 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
             }
         }
 
-        /* si la ligne est inutile
-        	=> on va directement à la prochaine iteration */
         if (first_usefull_char(chunk) == NULL) {
             continue;
         }
@@ -187,8 +128,6 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
             }
 
             for ( i = 0; i< strlen(chunk); i++ ) {
-                /* si la fin de la ligne chunk est inutile,
-                   on ajoute un espace dans input et on sort de la boucle*/
                 if ( in_string == FALSE && first_usefull_char(chunk + i) == NULL ) {
                     chunk[i]='\0';
                     input[strlen(input)] = ' ';
@@ -264,7 +203,6 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
                     }
                 }
 
-                /* recopie char par char*/
                 input[strlen(input)] = chunk[i];
             }
             if(in_string == TRUE) {
@@ -284,7 +222,6 @@ uint  sfs_get_sexpr( char *input, FILE *fp ) {
         }
     } while ( parlevel > 0 );
 
-    /* Suppression des espaces restant a la fin de l'expression, notamment le dernier '\n' */
     while (isspace(input[strlen(input)-1])) input[strlen(input)-1] = '\0';
 
     if(stdin == fp) {

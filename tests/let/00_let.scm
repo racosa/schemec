@@ -10,8 +10,6 @@
 (let ((u 45)) ())
 (define u 48)
 (let ((y 3)) (list u y))
-;(let ((x)) 4)
-;==> 4
 (let ((x 2)) x 45)
 (let ((x 7)) x u y)
 (let ((x 2) (y 4)) (list 'x y))

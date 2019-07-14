@@ -1,8 +1,7 @@
-
 /**
  * @file eval.c
- * @author François Cayre <cayre@yiking.(null)>
- * @date Fri Jun 22 20:11:30 2012
+ * @author racosa
+ * @date Sat Dec 03 00:00:00 2016
  * @brief Evaluation stuff for SFS.
  *
  * Evaluation stuff for SFS.

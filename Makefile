@@ -1,3 +1,4 @@
+# author: François Cayre <cayre@yiking.(null)>
 TARGET=scheme
 ROOTDIR=sfsn
 DIRNAME=`basename $(PWD)`
@@ -13,7 +14,6 @@ GARBAGE=*~ $(SRCDIR)/*~ $(INCDIR)/*~ $(TESTDIR)/*~
 
 INCLUDE=-I$(INCDIR)
 
-# Pour activer les sorties INFO_MSG, ajouter -DVERBOSE aux CFLAGS 
 CFLAGS=-Wall -ansi $(INCLUDE)
 LFLAGS=-lreadline -lm
 
@@ -25,7 +25,7 @@ SRC=$(wildcard $(SRCDIR)/*.c)
 OBJ_DBG=$(SRC:.c=.dbg)
 OBJ_RLS=$(SRC:.c=.rls)
 
-all : 
+all :
 	@echo "in " $(DIRNAME)
 	@echo ""
 	@echo "Usage:"
@@ -47,10 +47,9 @@ release : $(OBJ_RLS)
 %.rls : %.c
 	$(CC) $< $(CFLAGS_RLS) -c -o $(basename $<).rls
 
-clean : 
+clean :
 	$(RM) $(TARGET) $(SRCDIR)/*.orig $(SRCDIR)/*.dbg $(SRCDIR)/*.rls $(GARBAGE) scheme-`whoami`-*.tgz
 
-tarball : 
-	make clean 
+tarball :
+	make clean
 	cd .. && tar -czvf scheme-`whoami`-`date +%d-%m-%H-%M`.tgz $(DIRNAME) && cd $(DIRNAME) && mv ../scheme-`whoami`-*.tgz .
-

@@ -1,8 +1,8 @@
 
 /**
  * @file object.c
- * @author François Cayre <cayre@yiking.(null)>
- * @date Fri Jun 15 18:02:57 2012
+ * @author Rafael Costa
+ * @date Sat Nov 12 00:00:00 2016
  * @brief Object definitions for SFS.
  *
  * Object definitions for SFS.

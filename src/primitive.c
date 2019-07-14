@@ -1,6 +1,6 @@
 /**
  * @file primitive.c
- * @author Rafael Costa Sales
+ * @author Rafael Costa
  * @date Sat Nov 12 20:25:33 2016
  * @brief Primitive functions for the schemeC interpreter.
  *

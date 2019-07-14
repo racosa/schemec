@@ -1,6 +1,6 @@
 /**
  * @file compound.h
- * @author Rafael Costa Sales
+ * @author Rafael Costa
  * @date Sun Nov 27 21:05:43 2016
  * @brief Compounds definition for the schemeC interpreter.
  *
