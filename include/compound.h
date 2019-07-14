@@ -2,9 +2,9 @@
  * @file compound.h
  * @author Rafael Costa
  * @date Sun Nov 27 21:05:43 2016
- * @brief Compounds definition for the schemeC interpreter.
+ * @brief Compounds definition for the schemec interpreter.
  *
- * Compounds definition for the schemeC interpreter.
+ * Compounds definition for the schemec interpreter.
  */
 
 #ifndef _COMPOUND_H_

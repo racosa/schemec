@@ -2,9 +2,9 @@
  * @file environment.h
  * @author Rafael Costa
  * @date Sat Oct 16 00:56:33 2016
- * @brief Environment definition for the schemeC interpreter.
+ * @brief Environment definition for the schemec interpreter.
  *
- * Environment definition for the schemeC interpreter.
+ * Environment definition for the schemec interpreter.
  */
 
 #ifndef _ENVIRONMENT_H_

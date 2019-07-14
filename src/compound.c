@@ -2,9 +2,9 @@
  * @file compound.c
  * @author Rafael Costa
  * @date Sun Nov 27 21:06:43 2016
- * @brief Compound functions for the schemeC interpreter.
+ * @brief Compound functions for the schemec interpreter.
  *
- * Compound functions for the schemeC interpreter.
+ * Compound functions for the schemec interpreter.
  */
 
 #include "compound.h"

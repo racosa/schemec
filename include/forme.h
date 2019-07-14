@@ -2,9 +2,9 @@
  * @file forme.h
  * @author Rafael Costa
  * @date Sat Dec 03 21:05:43 2016
- * @brief Forme definition for the schemeC interpreter.
+ * @brief Forme definition for the schemec interpreter.
  *
- * Formes definition for the schemeC interpreter.
+ * Formes definition for the schemec interpreter.
  */
 
 #ifndef _FORME_H_

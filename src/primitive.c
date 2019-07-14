@@ -2,9 +2,9 @@
  * @file primitive.c
  * @author Rafael Costa
  * @date Sat Nov 12 20:25:33 2016
- * @brief Primitive functions for the schemeC interpreter.
+ * @brief Primitive functions for the schemec interpreter.
  *
- * Definition of the primitive functions for the schemeC interpreter.
+ * Definition of the primitive functions for the schemec interpreter.
  */
 
 #include <stdio.h>

@@ -1,4 +1,4 @@
-; Standard Library for the schemeC interpreter
+; Standard Library for the schemec interpreter
 ;
 (define (two-integers? x y) (and (integer? x) (integer? y)))
 

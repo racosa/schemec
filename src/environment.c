@@ -2,9 +2,9 @@
  * @file environment.c
  * @author Rafael Costa
  * @date Sat Oct 16 00:56:33 2016
- * @brief Environments functions for the schemeC interpreter.
+ * @brief Environments functions for the schemec interpreter.
  *
- * Functions to manipulate environments in the schemeC interpreter.
+ * Functions to manipulate environments in the schemec interpreter.
  */
 
 #include "object.h"
