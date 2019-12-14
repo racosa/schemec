@@ -1,3 +1,3 @@
 # schemec
 
-A Scheme interpreter written in C
+Simple Scheme interpreter in C
